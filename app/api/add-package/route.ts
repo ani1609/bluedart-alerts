@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     }
 
     const currentPackageStatus = await fetch(
-      `https://bluedart-alert.vercel.app/api/get-package-status?trackingNo=${trackingId}`
+      `https://bluedart-alert.vercel.app/api/get-package-status?trackingId=${trackingId}`
     );
 
     if (!currentPackageStatus.ok) {
@@ -34,8 +34,6 @@ export async function POST(req: Request) {
     }
 
     const currentPackageStatusData = await currentPackageStatus.json();
-
-    console.log("Current package status data:", currentPackageStatusData);
 
     if (currentPackageStatusData.message === "Tracking ID not found.") {
       return NextResponse.json(
@@ -53,7 +51,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           status: "error",
-          message: "Package with this tracking ID already exists.",
+          message: "Package with this tracking ID already registered.",
         },
         { status: 400 }
       );
@@ -63,6 +61,7 @@ export async function POST(req: Request) {
     const newPackage = new Package({
       email,
       trackingId,
+      events: currentPackageStatusData.data.events,
     });
 
     await newPackage.save();

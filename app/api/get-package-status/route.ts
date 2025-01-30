@@ -84,7 +84,7 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         status: "success",
-        data: tableData,
+        data: { events: tableData },
       },
       { status: 200 }
     );
