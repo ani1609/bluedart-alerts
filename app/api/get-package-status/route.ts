@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import * as cheerio from "cheerio";
+import {
+  handleMissingParamsError,
+  handleResourceNotFoundError,
+  handleInternalServerError,
+} from "@/utils/handle-api-errors";
 
 export async function GET(req: Request) {
   try {
@@ -7,13 +12,7 @@ export async function GET(req: Request) {
     const trackingId = url.searchParams.get("trackingId");
 
     if (!trackingId) {
-      return NextResponse.json(
-        {
-          status: "error",
-          message: "Tracking number is required.",
-        },
-        { status: 400 }
-      );
+      return handleMissingParamsError("Tracking ID is required.");
     }
 
     const response = await fetch(
@@ -21,13 +20,7 @@ export async function GET(req: Request) {
     );
 
     if (!response.ok) {
-      return NextResponse.json(
-        {
-          status: "error",
-          message: "Error fetching package status.",
-        },
-        { status: 404 }
-      );
+      return handleResourceNotFoundError("Error fetching package status.");
     }
 
     const html = await response.text();
@@ -36,13 +29,7 @@ export async function GET(req: Request) {
     // Check for "Records Not Found" error message
     const errorMessage = $(`div:contains('Records Not Found')`);
     if (errorMessage.length > 0) {
-      return NextResponse.json(
-        {
-          status: "error",
-          message: `Tracking ID not found.`,
-        },
-        { status: 404 }
-      );
+      return handleResourceNotFoundError("Tracking ID not found.");
     }
 
     const targetTable = $("table")
@@ -52,13 +39,7 @@ export async function GET(req: Request) {
       .first();
 
     if (!targetTable.length) {
-      return NextResponse.json(
-        {
-          status: "error",
-          message: "Status and Scans table not found.",
-        },
-        { status: 404 }
-      );
+      return handleResourceNotFoundError("Status and Scans table not found.");
     }
 
     const rows = targetTable.find("tbody > tr");
@@ -90,12 +71,8 @@ export async function GET(req: Request) {
     );
   } catch (error: unknown) {
     console.error("Error fetching data:", error);
-    return NextResponse.json(
-      {
-        status: "error",
-        message: "An error occurred. Please try again later.",
-      },
-      { status: 500 }
+    return handleInternalServerError(
+      "An error occurred while fetching the tracking data."
     );
   }
 }

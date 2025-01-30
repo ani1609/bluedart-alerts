@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { connectDb } from "@/lib/mongoose";
 import { Package } from "@/models/package";
+import {
+  handleApiError,
+  handleMissingParamsError,
+  handleResourceNotFoundError,
+  handleInternalServerError,
+} from "@/utils/handle-api-errors";
 
 export async function POST(req: Request) {
   await connectDb(); // Ensure we are connected to the database
@@ -9,51 +15,31 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, trackingId } = body;
 
-    if (!email || !trackingId) {
-      return NextResponse.json(
-        {
-          status: "error",
-          message: "Email and tracking ID are required.",
-        },
-        { status: 400 }
-      );
+    if (!email.trim() || !trackingId.trim()) {
+      return handleMissingParamsError("Email and tracking ID are required.");
     }
 
     const currentPackageStatus = await fetch(
-      `https://bluedart-alert.vercel.app/api/get-package-status?trackingId=${trackingId}`
+      `${
+        process.env.APP_BASE_URL
+      }/api/get-package-status?trackingId=${trackingId.trim()}`
     );
 
     if (!currentPackageStatus.ok) {
-      return NextResponse.json(
-        {
-          status: "error",
-          message: "Error fetching package status.",
-        },
-        { status: 404 }
-      );
+      return handleResourceNotFoundError("Error fetching package status.");
     }
 
     const currentPackageStatusData = await currentPackageStatus.json();
 
     if (currentPackageStatusData.message === "Tracking ID not found.") {
-      return NextResponse.json(
-        {
-          status: "error",
-          message: "Tracking ID not found.",
-        },
-        { status: 404 }
-      );
+      return handleResourceNotFoundError("Tracking ID not found.");
     }
 
     const existingPackage = await Package.findOne({ trackingId });
 
     if (existingPackage) {
-      return NextResponse.json(
-        {
-          status: "error",
-          message: "Package with this tracking ID already registered.",
-        },
-        { status: 400 }
+      return handleApiError(
+        new Error("Package with this tracking ID already registered.")
       );
     }
 
@@ -73,16 +59,10 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error) {
-    console.log("Error adding package:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    return NextResponse.json(
-      {
-        status: "error",
-        message: errorMessage,
-      },
-      { status: 500 }
+  } catch (error: unknown) {
+    console.error("Error adding package:", error);
+    return handleInternalServerError(
+      "An error occurred while adding the package."
     );
   }
 }
