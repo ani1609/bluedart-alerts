@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import fetch from "node-fetch";
 import * as cheerio from "cheerio";
 
 export async function GET(req: Request) {
@@ -27,6 +26,18 @@ export async function GET(req: Request) {
 
     const html = await response.text();
     const $ = cheerio.load(html);
+
+    // Check for "Records Not Found" error message
+    const errorMessage = $(`div:contains('Records Not Found')`);
+    if (errorMessage.length > 0) {
+      return NextResponse.json(
+        {
+          status: "error",
+          message: `Tracking ID not found.`,
+        },
+        { status: 404 }
+      );
+    }
 
     const targetTable = $("table")
       .filter(

@@ -19,7 +19,26 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if a package with the given trackingId already exists
+    const currentPackageStatus = await fetch("/api/get-package-status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ trackingNo: trackingId }),
+    });
+
+    const currentPackageStatusData = await currentPackageStatus.json();
+
+    if (currentPackageStatusData.message === "Tracking ID not found.") {
+      return NextResponse.json(
+        {
+          status: "error",
+          message: "Tracking ID not found.",
+        },
+        { status: 404 }
+      );
+    }
+
     const existingPackage = await Package.findOne({ trackingId });
 
     if (existingPackage) {
