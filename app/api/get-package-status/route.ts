@@ -4,9 +4,9 @@ import * as cheerio from "cheerio";
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const trackingNo = url.searchParams.get("trackingNo");
+    const trackingId = url.searchParams.get("trackingId");
 
-    if (!trackingNo) {
+    if (!trackingId) {
       return NextResponse.json(
         {
           status: "error",
@@ -17,11 +17,17 @@ export async function GET(req: Request) {
     }
 
     const response = await fetch(
-      `https://www.bluedart.com/web/guest/trackdartresultthirdparty?trackFor=0&trackNo=${trackingNo}`
+      `https://www.bluedart.com/web/guest/trackdartresultthirdparty?trackFor=0&trackNo=${trackingId}`
     );
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.statusText}`);
+      return NextResponse.json(
+        {
+          status: "error",
+          message: "Error fetching package status.",
+        },
+        { status: 404 }
+      );
     }
 
     const html = await response.text();

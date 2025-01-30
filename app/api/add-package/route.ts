@@ -19,15 +19,23 @@ export async function POST(req: Request) {
       );
     }
 
-    const currentPackageStatus = await fetch("/api/get-package-status", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ trackingNo: trackingId }),
-    });
+    const currentPackageStatus = await fetch(
+      `https://bluedart-alert.vercel.app/api/get-package-status?trackingNo=${trackingId}`
+    );
+
+    if (!currentPackageStatus.ok) {
+      return NextResponse.json(
+        {
+          status: "error",
+          message: "Error fetching package status.",
+        },
+        { status: 404 }
+      );
+    }
 
     const currentPackageStatusData = await currentPackageStatus.json();
+
+    console.log("Current package status data:", currentPackageStatusData);
 
     if (currentPackageStatusData.message === "Tracking ID not found.") {
       return NextResponse.json(
@@ -67,6 +75,7 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error) {
+    console.log("Error adding package:", error);
     const errorMessage =
       error instanceof Error ? error.message : "An unknown error occurred";
     return NextResponse.json(
