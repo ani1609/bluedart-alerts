@@ -1,0 +1,35 @@
+"use client";
+
+import { useTheme } from "next-themes";
+import { Button } from "./ui/button";
+import { MoonIcon, SunIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+
+export default function Navbar() {
+  const { theme, setTheme } = useTheme();
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  //shows hydration error otherwise
+  if (!mounted) {
+    return null;
+  }
+
+  return (
+    <div className="w-screen px-20 py-10 flex justify-end items-center">
+      <Button
+        className="flex-shrink-0 p-2.5 ring-0 focus:ring-0 focus:border-none text-grayscale-textIcon-title"
+        variant="ghost"
+        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      >
+        <SunIcon className="size-6 transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" />
+        <MoonIcon className="absolute size-6 transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    </div>
+  );
+}
