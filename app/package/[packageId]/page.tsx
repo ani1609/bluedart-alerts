@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -24,44 +24,59 @@ export default function PackageDetails({
   const { packageId } = use(params);
   const [packageEvents, setPackageEvents] = useState<PackageEvent[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [lastNumberOfEvents, setLastNumberOfEvents] = useState<number>(0);
 
   useEffect(() => {
-    const fetchPackageDetails = async () => {
-      if (!packageId) {
+    if (packageEvents.length > lastNumberOfEvents) {
+      if (Notification.permission === "granted") {
+        new Notification(`New event added to your package ${packageId}!`, {
+          body: "Check your package details for the latest event.",
+          icon: "https://images.jdmagicbox.com/comp/kolkata/s8/033pxx33.xx33.160721120133.p3s8/catalogue/blue-dart-express-ltd-east-kolkata-township-kolkata-courier-services-blue-dart-o5rxwzarvv.jpg",
+        });
+      }
+
+      setLastNumberOfEvents(packageEvents.length);
+    }
+  }, [packageEvents, lastNumberOfEvents, packageId]);
+
+  const fetchPackageDetails = useCallback(async () => {
+    if (!packageId) return;
+
+    setIsLoading(true);
+    try {
+      const responseResponse = await fetch(
+        `/api/get-package-status?trackingId=${packageId}`
+      );
+
+      if (!responseResponse.ok) {
+        console.error("Error fetching package details");
         return;
       }
 
-      setIsLoading(true);
+      const responseData = await responseResponse.json();
 
-      try {
-        const responseResponse = await fetch(
-          `/api/get-package-status?trackingId=${packageId}`
-        );
-
-        if (!responseResponse.ok) {
-          console.error("Error fetching package details");
-          return;
-        }
-
-        const responseData = await responseResponse.json();
-
-        if (responseData.status === "Not found") {
-          console.error("Package not found");
-          return;
-        }
-
-        setPackageEvents(responseData.data.events);
-
-        console.log(responseData);
-
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching package details", error);
+      if (responseData.status === "Not found") {
+        console.error("Package not found");
+        return;
       }
-    };
 
-    fetchPackageDetails();
+      setPackageEvents(responseData.data.events);
+    } catch (error) {
+      console.error("Error fetching package details", error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [packageId]);
+
+  useEffect(() => {
+    fetchPackageDetails();
+
+    const intervalId = setInterval(() => {
+      fetchPackageDetails();
+    }, 5000); // 5 minutes
+
+    return () => clearInterval(intervalId);
+  }, [fetchPackageDetails]);
 
   return (
     <main className="size-full flex justify-center items-start px-6">

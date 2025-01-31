@@ -20,15 +20,29 @@ export default function Home() {
     fetchPackages();
   }, []);
 
+  useEffect(() => {
+    const requestPermission = async () => {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        console.log("Notification permission granted");
+      } else if (permission === "denied") {
+        alert("You denied for the notification");
+      }
+    };
+
+    requestPermission();
+  }, []);
+
   return (
     <main className="size-full flex justify-center items-center">
       {packageIds && packageIds.length > 0 ? (
-        <ul>
+        <ul className="flex flex-col gap-y-2">
           {packageIds.map((packageId) => (
             <Link
               key={packageId}
               href={`/package/${packageId}`}
               target="_blank"
+              className="p-2"
             >
               <li key={packageId}>{packageId}</li>
             </Link>

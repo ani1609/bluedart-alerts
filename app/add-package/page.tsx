@@ -54,7 +54,7 @@ export default function AddPackage() {
   };
 
   return (
-    <main className="size-full flex justify-center items-center px-6">
+    <main className="size-full  flex justify-center items-center px-6">
       <form
         onSubmit={handleSubmit}
         className="flex flex-col items-start justify-start w-96 sm:w-full"
