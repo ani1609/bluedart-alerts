@@ -73,7 +73,7 @@ export default function PackageDetails({
 
     const intervalId = setInterval(() => {
       fetchPackageDetails();
-    }, 5000); // 5 minutes
+    }, 300000); // 1 minute
 
     return () => clearInterval(intervalId);
   }, [fetchPackageDetails]);
