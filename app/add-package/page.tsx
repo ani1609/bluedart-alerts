@@ -3,16 +3,16 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { db } from "@/lib/firebase-config";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { Timestamp } from "firebase/firestore";
+import { useRouter } from "next/navigation";
 
 export default function AddPackage() {
   const [packageId, setPackageId] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
   // const [email, setEmail] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [succes, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,32 +20,40 @@ export default function AddPackage() {
     try {
       setIsLoading(true);
       setSuccess(null);
+      setError(null);
 
-      const packageRef = doc(db, "packages", packageId);
-      const packageDoc = await getDoc(packageRef);
+      const response = await fetch("api/add-package", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          packageId,
+          title,
+        }),
+      });
 
-      if (packageDoc.exists()) {
-        console.log(
-          "Package already registered for updates :",
-          packageDoc.data()
-        );
-        setError("Package already registered for updates");
+      if (!response.ok) {
+        setError("Failed to add package. Invalid package ID.");
         return;
       }
 
-      await setDoc(packageRef, {
-        // email: email,
-        createdAt: Timestamp.now(),
-        updatedAt: Timestamp.now(),
-      });
+      const data = await response.json();
 
-      console.log("Document successfully written!");
+      if (data.status === "error") {
+        setError(data.message);
+        return;
+      }
 
       setError(null);
       setPackageId("");
       // setEmail("");
       setIsLoading(false);
       setSuccess("Package added successfully");
+
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
     } catch (error) {
       console.error("Error adding document: ", error);
     } finally {
@@ -57,7 +65,7 @@ export default function AddPackage() {
     <main className="size-full  flex justify-center items-center px-6">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-start justify-start w-96 sm:w-full"
+        className="flex flex-col items-start justify-start sm:w-96 w-full"
       >
         <h1 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           Add Package
@@ -72,15 +80,15 @@ export default function AddPackage() {
           required
           disabled={isLoading}
         />
-        {/* <Input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter email"
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter title"
           className="mt-4"
-          type="email"
+          type="text"
           required
           disabled={isLoading}
-        /> */}
+        />
 
         {error && <p className="text-red-500 mt-3 text-sm">{error}</p>}
 

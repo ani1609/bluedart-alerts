@@ -30,9 +30,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <main className="w-screen h-dvh">
+          <main className="w-screen h-dvh flex flex-col overflow-hidden">
             <Navbar />
-            <div className="w-full h-[calc(100dvh-7.25rem)]">{children}</div>
+            <div className="w-full flex-1">{children}</div>
           </main>
         </Providers>
       </body>

@@ -1,4 +1,3 @@
-// utils/handleApiError.ts
 import { NextResponse } from "next/server";
 
 export function handleApiError(error: unknown) {

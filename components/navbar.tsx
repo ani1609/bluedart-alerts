@@ -4,6 +4,7 @@ import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import { MoonIcon, SunIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Navbar() {
   const { theme, setTheme } = useTheme();
@@ -20,9 +21,18 @@ export default function Navbar() {
   }
 
   return (
-    <div className="w-screen px-20 py-10 flex justify-end items-center">
+    <div className="w-screen px-20 py-10 flex justify-between items-center">
+      <div className="flex justify-start items-center gap-x-10">
+        <Link href="/" className="px-4 py-2 border rounded">
+          Home
+        </Link>
+
+        <Link href="/add-package" className="px-4 py-2 border rounded">
+          Add Package
+        </Link>
+      </div>
       <Button
-        className="flex-shrink-0 p-2.5 ring-0 focus:ring-0 focus:border-none text-grayscale-textIcon-title"
+        className="flex-shrink-0 p-2.5 ring-0 focus:ring-0 focus:border-none text-grayscale-textIcon-title border"
         variant="ghost"
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       >
