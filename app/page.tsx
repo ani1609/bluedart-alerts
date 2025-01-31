@@ -17,24 +17,33 @@ interface ApiData {
 
 export default function Home() {
   const [packages, setPackages] = useState<Parcel[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchPackages = async () => {
-      const response = await fetch("/api/get-packages");
+      setIsLoading(true);
 
-      if (!response.ok) {
-        console.error("Failed to fetch packages");
-        return;
+      try {
+        const response = await fetch("/api/get-packages");
+
+        if (!response.ok) {
+          console.error("Failed to fetch packages");
+          return;
+        }
+
+        const responseData: ApiData = await response.json();
+
+        if (responseData.status === "error") {
+          console.error("Error fetching packages");
+          return;
+        }
+
+        setPackages(responseData.data.parcels);
+      } catch (error) {
+        console.error("Error fetching packages:", error);
+      } finally {
+        setIsLoading(false);
       }
-
-      const responseData: ApiData = await response.json();
-
-      if (responseData.status === "error") {
-        console.error("Error fetching packages");
-        return;
-      }
-
-      setPackages(responseData.data.parcels);
     };
 
     fetchPackages();
@@ -57,7 +66,9 @@ export default function Home() {
 
   return (
     <main className="size-full flex justify-center items-center">
-      {packages && packages.length > 0 ? (
+      {isLoading ? (
+        <p>Loading packages...</p>
+      ) : packages && packages.length > 0 ? (
         <ul className="flex flex-col gap-y-2">
           {packages.map((parcel, index) => (
             <Link
