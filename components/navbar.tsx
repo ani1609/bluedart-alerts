@@ -3,22 +3,10 @@
 import { useTheme } from "next-themes";
 import { Button } from "./ui/button";
 import { MoonIcon, SunIcon } from "lucide-react";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function Navbar() {
   const { theme, setTheme } = useTheme();
-
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  //shows hydration error otherwise
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <div className="w-screen px-5 py-10 sm:px-20 sm:py-10 flex justify-between items-center">
