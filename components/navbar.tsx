@@ -20,7 +20,7 @@ export default function Navbar() {
         </Link>
       </div>
       <Button
-        className="flex-shrink-0 p-2.5 ring-0 focus:ring-0 focus:border-none text-grayscale-textIcon-title border"
+        className="shrink-0 p-2.5 ring-0 focus:ring-0 focus:border-none text-grayscale-textIcon-title border"
         variant="ghost"
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       >

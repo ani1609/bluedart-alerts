@@ -90,7 +90,7 @@ export default function PackageDetails({
           {packageEvents && packageEvents.length > 0 ? (
             <div className="flex flex-wrap gap-4 max-h-[calc(100dvh-12.814rem)] pr-1 overflow-auto  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
               {packageEvents.map((event, index) => (
-                <Card key={index} className="w-full sm:w-96 flex-grow">
+                <Card key={index} className="w-full sm:w-96 grow">
                   <CardHeader className="p-4">
                     <CardTitle>
                       {event.date} {event.time}
