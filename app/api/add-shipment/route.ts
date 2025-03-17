@@ -19,25 +19,16 @@ async function sendDiscordMessage({
   userDiscordId: string;
   message: string;
 }): Promise<boolean> {
-  const MAX_RETRIES = 3;
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      const response = await axios.post(`${BASE_URL}/api/send-message`, {
-        userDiscordId,
-        message,
-      });
-
-      if (response.status === 200) return true;
-    } catch (error: any) {
-      console.error(
-        `Attempt ${attempt} failed to send Discord message:`,
-        error?.response?.data || error.message
-      );
-      if (attempt === MAX_RETRIES) return false;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 1000 * attempt)); // Exponential backoff
+  try {
+    const response = await axios.post(`${BASE_URL}/api/send-message`, {
+      userDiscordId,
+      message,
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error("Failed to send Discord message:", error);
+    return false;
   }
-  return false;
 }
 
 export async function POST(req: Request) {
