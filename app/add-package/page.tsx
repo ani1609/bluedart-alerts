@@ -32,6 +32,11 @@ export default function AddPackage() {
 
       const addShipmentRes = await axios.post("/api/add-shipment", apibody);
 
+      if (addShipmentRes.status === 404) {
+        setError("Shipment with this tracking ID already exists.");
+        return;
+      }
+
       if (addShipmentRes.status !== 200) {
         setError("An error occurred. Please try again later.");
         return;
@@ -40,7 +45,7 @@ export default function AddPackage() {
       const addShipmentData: AddShipmentResponse = await addShipmentRes.data;
 
       if (addShipmentData.status === "error") {
-        setError(addShipmentData.data.message);
+        setError("An error occurred. Please try again later.");
         return;
       }
 
@@ -55,6 +60,7 @@ export default function AddPackage() {
       }, 1000);
     } catch (error) {
       console.error("Error adding shipment: ", error);
+      setError("An error occurred. Please try again later.");
     } finally {
       setIsLoading(false);
     }

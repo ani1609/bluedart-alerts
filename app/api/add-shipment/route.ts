@@ -14,6 +14,7 @@ export async function POST(req: Request) {
 
   try {
     await connectToDatabase();
+
     const body: AddShipmentRequest = await req.json();
     const { title, trackingId, userDiscordId } = body;
 
@@ -34,6 +35,11 @@ export async function POST(req: Request) {
 
     // Fetch shipment status
     const shipmentStatus = await fetchShipmentStatus({ trackingId });
+
+    // Error if shipmentStatus is invalid
+    if (!shipmentStatus || shipmentStatus.status === "error") {
+      return handleApiError(new Error("Failed to fetch shipment status"));
+    }
 
     // Create shipment
     const newShipment = await Shipment.create({

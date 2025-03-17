@@ -12,23 +12,29 @@ export async function POST(req: Request) {
     const body: SendMessageRequest = await req.json();
     const { userDiscordId, message } = body;
 
+    // Validate input
     if (!userDiscordId || !message) {
       return handleMissingParamsError(
         "userDiscordId (user ID) and message are required"
       );
     }
 
+    // Create DM channel with user
     const dmChannel = (await rest.post(Routes.userChannels(), {
       body: { recipient_id: userDiscordId },
     })) as APIChannel;
 
+    // Send message to the created DM channel
     await rest.post(Routes.channelMessages(dmChannel.id), {
       body: { content: message },
     });
 
+    // Success response
     const resPayload: SendMessageResponse = {
       status: "success",
-      data: { message: "DM sent!" },
+      data: {
+        message: "DM sent!",
+      },
     };
 
     return NextResponse.json(resPayload, { status: 200 });

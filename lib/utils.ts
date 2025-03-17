@@ -20,37 +20,52 @@ export function handleApiError(error: unknown): NextResponse {
   return NextResponse.json(
     {
       status: "error",
-      message: errorMessage,
+      data: {
+        type: "api_error",
+        message: errorMessage,
+      },
     },
     { status: 500 }
   );
 }
 
+// Handle missing parameters error
 export function handleMissingParamsError(message: string): NextResponse {
   return NextResponse.json(
     {
       status: "error",
-      message,
+      data: {
+        type: "missing_params",
+        message,
+      },
     },
     { status: 400 }
   );
 }
 
+// Handle resource not found error
 export function handleResourceNotFoundError(message: string): NextResponse {
   return NextResponse.json(
     {
       status: "error",
-      message,
+      data: {
+        type: "resource_not_found",
+        message,
+      },
     },
     { status: 404 }
   );
 }
 
+// Handle internal server error
 export function handleInternalServerError(message: string): NextResponse {
   return NextResponse.json(
     {
       status: "error",
-      message,
+      data: {
+        type: "internal_server_error",
+        message,
+      },
     },
     { status: 500 }
   );
