@@ -6,6 +6,7 @@ delete mongoose.models.Shipment;
 
 const ShipmentSchema = new Schema<ShipmentInterface>(
   {
+    title: { type: String, required: true },
     trackingId: { type: String, required: true, unique: true },
     events: [
       {

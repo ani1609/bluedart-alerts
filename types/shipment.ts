@@ -9,6 +9,7 @@ export interface Event {
 }
 
 export interface AddShipmentRequest {
+  title: string;
   trackingId: string;
   userDiscordId: string;
 }
@@ -32,6 +33,7 @@ export interface ShipmentStatusResponse {
 }
 
 export interface Shipment extends Document {
+  title: string;
   trackingId: string;
   events: Event[];
   userDiscordId: string;

@@ -10,21 +10,23 @@ import { AddShipmentRequest, AddShipmentResponse } from "@/types/shipment";
 import { fetchShipmentStatus, sendMessage } from "@/lib/utils";
 
 export async function POST(req: Request) {
+  console.log("Request received at /api/add-shipment");
+
   try {
     await connectToDatabase();
     const body: AddShipmentRequest = await req.json();
-    const { trackingId, userDiscordId } = body;
+    const { title, trackingId, userDiscordId } = body;
 
     // Validate input
-    if (!trackingId || !userDiscordId) {
+    if (!trackingId || !userDiscordId || !title) {
       return handleMissingParamsError(
-        "Missing required fields ( trackingId, userDiscordId, events )"
+        "Missing required fields ( trackingId, userDiscordId, title )"
       );
     }
 
     // Check if shipment exists
     const existingShipment = await Shipment.findOne({
-      trackingId: body.trackingId,
+      trackingId,
     });
     if (existingShipment) {
       return handleResourceNotFoundError("Shipment already exists");
@@ -35,8 +37,9 @@ export async function POST(req: Request) {
 
     // Create shipment
     const newShipment = await Shipment.create({
-      trackingId: body.trackingId,
-      userDiscordId: body.userDiscordId,
+      title,
+      trackingId: trackingId,
+      userDiscordId: userDiscordId,
       events: shipmentStatus.data.events,
     });
     if (!newShipment) {
@@ -44,7 +47,7 @@ export async function POST(req: Request) {
     }
 
     // Notify user on Discord
-    const message = `Your shipment with tracking ID ${body.trackingId} has been added for event alerts!`;
+    const message = `Your shipment with tracking ID ${trackingId} has been added for event alerts!`;
 
     const discordMessageSent = await sendMessage({
       userDiscordId,
