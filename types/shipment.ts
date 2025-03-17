@@ -38,3 +38,17 @@ export interface Shipment extends Document {
   events: Event[];
   userDiscordId: string;
 }
+
+export interface ShipmentsResponse {
+  status: Status;
+  data: {
+    shipments: Shipment[];
+  };
+}
+
+export interface ShipmentResponse {
+  status: Status;
+  data: {
+    shipment: Shipment;
+  };
+}
