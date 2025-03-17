@@ -10,7 +10,6 @@ export interface Event {
 
 export interface AddShipmentRequest {
   trackingId: string;
-  events: Event[];
   userDiscordId: string;
 }
 
@@ -18,8 +17,11 @@ export interface AddShipmentResponse {
   status: Status;
   data: {
     message: string;
-    shipment: Shipment;
   };
+}
+
+export interface ShipmentStatusRequest {
+  trackingId: string;
 }
 
 export interface ShipmentStatusResponse {
