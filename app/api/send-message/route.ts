@@ -27,7 +27,10 @@ export async function POST(req: Request) {
       body: { content: message },
     });
 
-    return NextResponse.json({ success: true, message: "DM sent!" });
+    return NextResponse.json({
+      status: "success",
+      data: { message: "DM sent!" },
+    });
   } catch (error) {
     console.error("Error sending Discord DM:", error);
     return handleApiError(error);
