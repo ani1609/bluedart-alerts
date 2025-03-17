@@ -1,4 +1,4 @@
-import { handleInternalServerError } from "@/utils/handle-api-errors";
+import { handleInternalServerError } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
 export async function GET() {

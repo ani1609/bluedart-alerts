@@ -4,8 +4,8 @@ import {
   handleMissingParamsError,
   handleResourceNotFoundError,
   handleInternalServerError,
-} from "@/utils/handle-api-errors";
-import { Event } from "@/types/shipment";
+} from "@/lib/utils";
+import { Event, ShipmentStatusResponse } from "@/types/shipment";
 
 export async function GET(req: Request) {
   try {
@@ -58,13 +58,12 @@ export async function GET(req: Request) {
       }
     });
 
-    return NextResponse.json(
-      {
-        status: "success",
-        data: { events: tableData },
-      },
-      { status: 200 }
-    );
+    const resPayload: ShipmentStatusResponse = {
+      status: "success",
+      data: { events: tableData },
+    };
+
+    return NextResponse.json(resPayload, { status: 200 });
   } catch (error: unknown) {
     console.error("Error fetching data:", error);
     return handleInternalServerError(

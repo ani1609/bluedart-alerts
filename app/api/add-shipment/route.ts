@@ -3,11 +3,11 @@ import {
   handleApiError,
   handleMissingParamsError,
   handleResourceNotFoundError,
-} from "@/utils/handle-api-errors";
+} from "@/lib/utils";
 import { connectToDatabase } from "@/lib/mongodb";
 import Shipment from "@/models/shipment";
 import axios from "axios";
-import { ShipmentRequest } from "@/types/shipment";
+import { AddShipmentRequest, AddShipmentResponse } from "@/types/shipment";
 
 const BASE_URL = process.env.BASE_URL || "";
 
@@ -34,10 +34,11 @@ async function sendDiscordMessage({
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
-    const body: ShipmentRequest = await req.json();
+    const body: AddShipmentRequest = await req.json();
+    const { trackingId, userDiscordId, events } = body;
 
     // Validate input
-    if (!body.trackingId || !body.userDiscordId || !body.events) {
+    if (!trackingId || !userDiscordId || !events) {
       return handleMissingParamsError(
         "Missing required fields ( trackingId, userDiscordId, events )"
       );
@@ -62,20 +63,25 @@ export async function POST(req: Request) {
     }
 
     // Notify user on Discord
-    const message = `🚚 Your shipment with tracking ID ${body.trackingId} has been added for event alerts!`;
+    const message = `Your shipment with tracking ID ${body.trackingId} has been added for event alerts!`;
 
     const discordMessageSent = await sendDiscordMessage({
       userDiscordId: body.userDiscordId,
       message,
     });
     if (!discordMessageSent) {
-      console.error("Failed to send Discord message after retries.");
+      return handleApiError(new Error("Failed to send Discord message"));
     }
 
-    return NextResponse.json({
+    const resPayload: AddShipmentResponse = {
       status: "success",
-      shipment: newShipment,
-    });
+      data: {
+        message,
+        shipment: newShipment,
+      },
+    };
+
+    return NextResponse.json(resPayload, { status: 200 });
   } catch (error) {
     console.error("Error processing shipment request:", error);
     return handleApiError(error);
