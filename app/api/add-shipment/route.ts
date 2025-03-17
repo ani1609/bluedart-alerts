@@ -10,8 +10,6 @@ import { AddShipmentRequest, AddShipmentResponse } from "@/types/shipment";
 import { fetchShipmentStatus, sendMessage } from "@/lib/utils";
 
 export async function POST(req: Request) {
-  console.log("Request received at /api/add-shipment");
-
   try {
     await connectToDatabase();
 

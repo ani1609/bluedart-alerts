@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import { Shipment as ShipmentInterface } from "@/types/shipment";
 
 // Force schema update by deleting the existing model
-delete mongoose.models.Shipment;
+// delete mongoose.models.Shipment;
 
 const ShipmentSchema = new Schema<ShipmentInterface>(
   {
