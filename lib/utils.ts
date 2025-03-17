@@ -1,5 +1,7 @@
 import { SendMessageRequest, SendMessageResponse } from "@/types/message";
 import {
+  ShipmentResponse,
+  ShipmentsResponse,
   ShipmentStatusRequest,
   ShipmentStatusResponse,
 } from "@/types/shipment";
@@ -70,6 +72,52 @@ export function handleInternalServerError(message: string): NextResponse {
     { status: 500 }
   );
 }
+
+export const fetchShipments = async (): Promise<ShipmentsResponse> => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/shipments`);
+
+    if (response.status !== 200) {
+      throw new Error("Failed to fetch shipments");
+    }
+
+    const data: ShipmentsResponse = response.data;
+
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch shipments:", error);
+    return {
+      status: "error",
+      data: { shipments: [] },
+    };
+  }
+};
+
+export const fetchShipment = async ({
+  trackingId,
+}: {
+  trackingId: string;
+}): Promise<ShipmentResponse> => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/api/shipment?trackingId=${trackingId}`
+    );
+
+    if (response.status !== 200) {
+      throw new Error("Failed to fetch shipment");
+    }
+
+    const data: ShipmentResponse = response.data;
+
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch shipment:", error);
+    return {
+      status: "error",
+      data: { shipment: null },
+    };
+  }
+};
 
 export async function fetchShipmentStatus({
   trackingId,

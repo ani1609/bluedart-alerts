@@ -49,6 +49,6 @@ export interface ShipmentsResponse {
 export interface ShipmentResponse {
   status: Status;
   data: {
-    shipment: Shipment;
+    shipment: Shipment | null;
   };
 }
