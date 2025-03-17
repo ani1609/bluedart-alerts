@@ -4,11 +4,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { AddShipmentRequest, AddShipmentResponse } from "@/types/shipment";
 
 export default function AddPackage() {
   const [packageId, setPackageId] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-  // const [email, setEmail] = useState<string>("");
+  const [discordId, setDiscordId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [succes, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -22,26 +24,28 @@ export default function AddPackage() {
       setSuccess(null);
       setError(null);
 
-      const response = await fetch("api/add-package", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          packageId,
-          title,
-        }),
-      });
+      const apibody: AddShipmentRequest = {
+        title,
+        trackingId: packageId,
+        userDiscordId: discordId,
+      };
 
-      if (!response.ok) {
-        setError("Failed to add package. Invalid package ID.");
+      const addShipmentRes = await axios.post("/api/add-shipment", apibody);
+
+      if (addShipmentRes.status === 404) {
+        setError("Shipment with this tracking ID already exists.");
         return;
       }
 
-      const data = await response.json();
+      if (addShipmentRes.status !== 200) {
+        setError("An error occurred. Please try again later.");
+        return;
+      }
 
-      if (data.status === "error") {
-        setError(data.message);
+      const addShipmentData: AddShipmentResponse = await addShipmentRes.data;
+
+      if (addShipmentData.status === "error") {
+        setError("An error occurred. Please try again later.");
         return;
       }
 
@@ -55,7 +59,8 @@ export default function AddPackage() {
         router.push("/");
       }, 1000);
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error adding shipment: ", error);
+      setError("An error occurred. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -72,18 +77,29 @@ export default function AddPackage() {
         </h1>
 
         <Input
-          value={packageId}
-          onChange={(e) => setPackageId(e.target.value)}
-          placeholder="Enter package ID"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter title"
           className="mt-4"
           type="text"
           required
           disabled={isLoading}
         />
+
         <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter title"
+          value={packageId}
+          onChange={(e) => setPackageId(e.target.value)}
+          placeholder="Enter tracking ID"
+          className="mt-4"
+          type="text"
+          required
+          disabled={isLoading}
+        />
+
+        <Input
+          value={discordId}
+          onChange={(e) => setDiscordId(e.target.value)}
+          placeholder="Enter Discord ID"
           className="mt-4"
           type="text"
           required

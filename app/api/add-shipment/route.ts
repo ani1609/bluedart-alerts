@@ -6,69 +6,60 @@ import {
 } from "@/lib/utils";
 import { connectToDatabase } from "@/lib/mongodb";
 import Shipment from "@/models/shipment";
-import axios from "axios";
 import { AddShipmentRequest, AddShipmentResponse } from "@/types/shipment";
-
-const BASE_URL = process.env.BASE_URL || "";
-
-// Utility function to send a Discord message with retries
-async function sendDiscordMessage({
-  userDiscordId,
-  message,
-}: {
-  userDiscordId: string;
-  message: string;
-}): Promise<boolean> {
-  try {
-    const response = await axios.post(`${BASE_URL}/api/send-message`, {
-      userDiscordId,
-      message,
-    });
-    return response.status === 200;
-  } catch (error) {
-    console.error("Failed to send Discord message:", error);
-    return false;
-  }
-}
+import { fetchShipmentStatus, sendMessage } from "@/lib/utils";
 
 export async function POST(req: Request) {
+  console.log("Request received at /api/add-shipment");
+
   try {
     await connectToDatabase();
+
     const body: AddShipmentRequest = await req.json();
-    const { trackingId, userDiscordId, events } = body;
+    const { title, trackingId, userDiscordId } = body;
 
     // Validate input
-    if (!trackingId || !userDiscordId || !events) {
+    if (!trackingId || !userDiscordId || !title) {
       return handleMissingParamsError(
-        "Missing required fields ( trackingId, userDiscordId, events )"
+        "Missing required fields ( trackingId, userDiscordId, title )"
       );
-    }
-
-    if (!Array.isArray(body.events)) {
-      return handleMissingParamsError("Events must be an array");
     }
 
     // Check if shipment exists
     const existingShipment = await Shipment.findOne({
-      trackingId: body.trackingId,
+      trackingId,
     });
     if (existingShipment) {
       return handleResourceNotFoundError("Shipment already exists");
     }
 
+    // Fetch shipment status
+    const shipmentStatus = await fetchShipmentStatus({ trackingId });
+
+    // Error if shipmentStatus is invalid
+    if (!shipmentStatus || shipmentStatus.status === "error") {
+      return handleApiError(new Error("Failed to fetch shipment status"));
+    }
+
     // Create shipment
-    const newShipment = await Shipment.create(body);
+    const newShipment = await Shipment.create({
+      title,
+      trackingId: trackingId,
+      userDiscordId: userDiscordId,
+      events: shipmentStatus.data.events,
+    });
     if (!newShipment) {
       return handleApiError(new Error("Database insertion failed"));
     }
 
     // Notify user on Discord
-    const message = `Your shipment with tracking ID ${body.trackingId} has been added for event alerts!`;
+    const message = `Your shipment with tracking ID ${trackingId} has been added for event alerts!`;
 
-    const discordMessageSent = await sendDiscordMessage({
-      userDiscordId: body.userDiscordId,
+    const discordMessageSent = await sendMessage({
+      userDiscordId,
       message,
     });
+
     if (!discordMessageSent) {
       return handleApiError(new Error("Failed to send Discord message"));
     }
@@ -76,8 +67,7 @@ export async function POST(req: Request) {
     const resPayload: AddShipmentResponse = {
       status: "success",
       data: {
-        message,
-        shipment: newShipment,
+        message: "Shipment added successfully",
       },
     };
 
