@@ -1,24 +1,26 @@
 import { NextResponse } from "next/server";
 import { REST } from "@discordjs/rest";
 import { Routes, APIChannel } from "discord-api-types/v10";
+import {
+  handleApiError,
+  handleMissingParamsError,
+} from "@/utils/handle-api-errors";
 
 const DISCORD_TOKEN = process.env.DISCORD_BOT_TOKEN || "";
-
 const rest = new REST({ version: "10" }).setToken(DISCORD_TOKEN);
 
 export async function POST(req: Request) {
   try {
-    const { userDiscord, message } = await req.json();
+    const { userDiscordId, message } = await req.json();
 
-    if (!userDiscord || !message) {
-      return NextResponse.json(
-        { error: "userDiscord (user ID) and message are required" },
-        { status: 400 }
+    if (!userDiscordId || !message) {
+      return handleMissingParamsError(
+        "userDiscordId (user ID) and message are required"
       );
     }
 
     const dmChannel = (await rest.post(Routes.userChannels(), {
-      body: { recipient_id: userDiscord },
+      body: { recipient_id: userDiscordId },
     })) as APIChannel;
 
     await rest.post(Routes.channelMessages(dmChannel.id), {
@@ -28,6 +30,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, message: "DM sent!" });
   } catch (error) {
     console.error("Error sending Discord DM:", error);
-    return NextResponse.json({ error: "Failed to send DM" }, { status: 500 });
+    return handleApiError(error);
   }
 }
