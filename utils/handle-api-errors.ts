@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export function handleApiError(error: unknown) {
+export function handleApiError(error: unknown): NextResponse {
   const errorMessage =
     error instanceof Error ? error.message : "An unknown error occurred";
   return NextResponse.json(
@@ -12,7 +12,7 @@ export function handleApiError(error: unknown) {
   );
 }
 
-export function handleMissingParamsError(message: string) {
+export function handleMissingParamsError(message: string): NextResponse {
   return NextResponse.json(
     {
       status: "error",
@@ -22,7 +22,7 @@ export function handleMissingParamsError(message: string) {
   );
 }
 
-export function handleResourceNotFoundError(message: string) {
+export function handleResourceNotFoundError(message: string): NextResponse {
   return NextResponse.json(
     {
       status: "error",
@@ -32,7 +32,7 @@ export function handleResourceNotFoundError(message: string) {
   );
 }
 
-export function handleInternalServerError(message: string) {
+export function handleInternalServerError(message: string): NextResponse {
   return NextResponse.json(
     {
       status: "error",

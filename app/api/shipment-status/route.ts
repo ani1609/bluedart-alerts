@@ -5,6 +5,7 @@ import {
   handleResourceNotFoundError,
   handleInternalServerError,
 } from "@/utils/handle-api-errors";
+import { Event } from "@/types/shipment";
 
 export async function GET(req: Request) {
   try {
@@ -43,12 +44,7 @@ export async function GET(req: Request) {
     }
 
     const rows = targetTable.find("tbody > tr");
-    const tableData: {
-      location: string;
-      details: string;
-      date: string;
-      time: string;
-    }[] = [];
+    const tableData: Event[] = [];
 
     rows.each((_, row) => {
       const cols = $(row).find("td");
