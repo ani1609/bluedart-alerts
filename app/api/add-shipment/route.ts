@@ -51,7 +51,23 @@ export async function POST(req: Request) {
     }
 
     // Notify user on Discord
-    const message = `Your shipment with tracking ID ${trackingId} has been added for event alerts!`;
+    const message =
+      `Your shipment with tracking ID ${trackingId} has been added for event alerts!` +
+      `The latest event for your shipment ${title} is:\n` +
+      `Location: ${
+        shipmentStatus.data.events[shipmentStatus.data.events.length - 1]
+          .location
+      }\n` +
+      `Details: ${
+        shipmentStatus.data.events[shipmentStatus.data.events.length - 1]
+          .details
+      }\n` +
+      `Date: ${
+        shipmentStatus.data.events[shipmentStatus.data.events.length - 1].date
+      }\n` +
+      `Time: ${
+        shipmentStatus.data.events[shipmentStatus.data.events.length - 1].time
+      }`;
 
     const discordMessageSent = await sendMessage({
       userDiscordId,

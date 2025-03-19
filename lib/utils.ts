@@ -138,7 +138,10 @@ export async function fetchShipmentStatus({
     console.error("Failed to fetch shipment status:", error);
     return {
       status: "error",
-      data: { events: [] },
+      data: {
+        trackingId,
+        events: [],
+      },
     };
   }
 }
