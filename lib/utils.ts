@@ -124,7 +124,7 @@ export async function fetchShipmentStatus({
 }: ShipmentStatusRequest): Promise<ShipmentStatusResponse> {
   try {
     const eventsRes = await axios.get(
-      `${BASE_URL}/api/mock-shipment-status?trackingId=${trackingId}`
+      `${BASE_URL}/api/shipment-status?trackingId=${trackingId}`
     );
 
     if (eventsRes.status !== 200) {
