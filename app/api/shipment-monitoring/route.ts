@@ -46,11 +46,13 @@ export async function GET() {
 
         // Send message to shipment owner
         const message =
-          `Your shipment ${shipmentFromDb.title} has new events:\n` +
-          `Location: ${newEvents[0].location}\n` +
-          `Details: ${newEvents[0].details}\n` +
-          `Date: ${newEvents[0].date}\n` +
-          `Time: ${newEvents[0].time}`;
+          `\n━━━━━━━━━━━━━━━━━━━━━\n` +
+          `📦  **Shipment Update!**  📦\n\n` +
+          `🚚  Your shipment **${shipmentFromDb.title}** has new events:\n\n` +
+          `📍  **Location:** ${newEvents[0].location}\n` +
+          `📝  **Details:** ${newEvents[0].details}\n` +
+          `📅  **Date:** ${newEvents[0].date}\n` +
+          `⏰  **Time:** ${newEvents[0].time}`;
 
         await sendMessage({
           userDiscordId: shipmentFromDb.userDiscordId,

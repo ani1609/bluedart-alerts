@@ -31,8 +31,8 @@ export async function POST(req: Request) {
         events: newEvents,
       });
     } else {
-      // Append new events if document exists
-      mockStatus.events.push(...newEvents);
+      // Prepend new events to the beginning of the array (that is how bluedart works)
+      mockStatus.events.unshift(...newEvents);
     }
 
     await mockStatus.save();
