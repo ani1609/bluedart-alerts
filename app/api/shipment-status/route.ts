@@ -60,7 +60,10 @@ export async function GET(req: Request) {
 
     const resPayload: ShipmentStatusResponse = {
       status: "success",
-      data: { events: tableData },
+      data: {
+        trackingId,
+        events: tableData,
+      },
     };
 
     return NextResponse.json(resPayload, { status: 200 });

@@ -8,6 +8,11 @@ export interface Event {
   time: string;
 }
 
+export interface MockEvent extends Document {
+  trackingId: string;
+  events: Event[];
+}
+
 export interface AddShipmentRequest {
   title: string;
   trackingId: string;
@@ -28,6 +33,7 @@ export interface ShipmentStatusRequest {
 export interface ShipmentStatusResponse {
   status: Status;
   data: {
+    trackingId: string;
     events: Event[];
   };
 }
