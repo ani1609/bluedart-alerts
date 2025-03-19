@@ -56,20 +56,10 @@ export async function POST(req: Request) {
       `🚀  **Shipment Tracking Activated!**  🚀\n\n` +
       `Your shipment with tracking ID **${trackingId}** has been added for event alerts!\n\n` +
       `The latest event for your shipment **${title}** is:\n` +
-      `📍  **Location:** ${
-        shipmentStatus.data.events[shipmentStatus.data.events.length - 1]
-          .location
-      }\n` +
-      `📝  **Details:** ${
-        shipmentStatus.data.events[shipmentStatus.data.events.length - 1]
-          .details
-      }\n` +
-      `📅  **Date:** ${
-        shipmentStatus.data.events[shipmentStatus.data.events.length - 1].date
-      }\n` +
-      `⏰  **Time:** ${
-        shipmentStatus.data.events[shipmentStatus.data.events.length - 1].time
-      }`;
+      `📍  **Location:** ${shipmentStatus.data.events[0].location}\n` +
+      `📝  **Details:** ${shipmentStatus.data.events[0].details}\n` +
+      `📅  **Date:** ${shipmentStatus.data.events[0].date}\n` +
+      `⏰  **Time:** ${shipmentStatus.data.events[0].time}`;
 
     const discordMessageSent = await sendMessage({
       userDiscordId,
