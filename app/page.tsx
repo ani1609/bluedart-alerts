@@ -45,7 +45,7 @@ export default function Home() {
             <Link
               key={index}
               href={`/shipment/${shipment.trackingId}`}
-              target="_blank"
+              // target="_blank"
               className="p-2"
             >
               <li className="flex justify-between items-center px-4 py-2 border gap-x-6 rounded-md">
