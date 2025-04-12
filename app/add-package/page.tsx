@@ -10,7 +10,7 @@ import { AddShipmentRequest, AddShipmentResponse } from "@/types/shipment";
 export default function AddPackage() {
   const [packageId, setPackageId] = useState<string>("");
   const [title, setTitle] = useState<string>("");
-  const [discordId, setDiscordId] = useState<string>("");
+  const [discordId, setDiscordId] = useState<string>("1311947122710413405");
   const [error, setError] = useState<string | null>(null);
   const [succes, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
