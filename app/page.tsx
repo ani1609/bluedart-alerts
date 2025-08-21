@@ -57,7 +57,11 @@ export default function Home() {
     trackingId: string;
   }) => {
     try {
-      await deleteShipment({ trackingId });
+      toast.promise(deleteShipment({ trackingId }), {
+        loading: "Deleting package...",
+        success: "Package has been deleted",
+        error: "Error deleting package",
+      });
 
       setShipments((prevShipments) =>
         prevShipments.filter((shipment) => shipment.trackingId !== trackingId)

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { addShipment } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface AddPackageCompProps {
   userDiscordId: string;
@@ -23,14 +24,20 @@ export default function AddPackageComp({ userDiscordId }: AddPackageCompProps) {
     try {
       setIsLoading(true);
 
-      await addShipment({
-        title,
-        trackingId: packageId,
-        userDiscordId: discordId,
-      });
+      toast.promise(
+        addShipment({
+          title,
+          trackingId: packageId,
+          userDiscordId: discordId,
+        }),
+        {
+          loading: "Adding package...",
+          success: "Package added successfully",
+          error: "Error adding package",
+        }
+      );
 
       setPackageId("");
-      // setEmail("");
       setIsLoading(false);
 
       setTimeout(() => {
