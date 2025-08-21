@@ -12,7 +12,6 @@ import { EllipsisVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteShipment, fetchAllShipments } from "@/lib/utils";
 import { toast } from "sonner";
-import { set } from "mongoose";
 
 export default function Home() {
   const [shipments, setShipments] = useState<Shipment[]>([]);
