@@ -7,10 +7,12 @@ import {
 } from "@/lib/utils";
 import { Event, ShipmentStatusResponse } from "@/types/shipment";
 
-export async function GET(req: Request) {
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ trackingId: string }> }
+) {
   try {
-    const url = new URL(req.url);
-    const trackingId = url.searchParams.get("trackingId");
+    const { trackingId } = await params;
 
     if (!trackingId) {
       return handleMissingParamsError("Tracking ID is required.");

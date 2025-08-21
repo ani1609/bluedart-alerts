@@ -6,7 +6,7 @@ export async function GET() {
     return NextResponse.json(
       {
         status: "success",
-        data: { message: "Hello World!" },
+        data: { message: "Hello from Bluedart-Alerts!" },
       },
       { status: 200 }
     );

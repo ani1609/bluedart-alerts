@@ -1,6 +1,6 @@
 import {
   handleApiError,
-  fetchShipments,
+  fetchAllShipments,
   fetchShipmentStatus,
   sendMessage,
 } from "@/lib/utils";
@@ -13,7 +13,7 @@ export async function GET() {
     await connectToDatabase();
 
     // Fetch all shipments from db
-    const shipmentsData = await fetchShipments();
+    const shipmentsData = await fetchAllShipments();
 
     for (const shipment of shipmentsData.data.shipments) {
       // Get the shipment from the database to ensure it's a Mongoose document
