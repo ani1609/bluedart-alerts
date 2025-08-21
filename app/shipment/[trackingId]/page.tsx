@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import axios from "axios";
-import { Shipment, ShipmentResponse } from "@/types/shipment";
+import { Shipment } from "@/types/shipment";
+import { fetchShipment } from "@/lib/utils";
 
 export default function PackageDetails({
   params,
@@ -26,18 +26,9 @@ export default function PackageDetails({
 
       setIsLoading(true);
       try {
-        const shipmentRes = await axios.get(
-          `/api/shipment?trackingId=${trackingId}`
-        );
+        const fetchShipmentRes = await fetchShipment({ trackingId });
 
-        const shipmentData: ShipmentResponse = shipmentRes.data;
-
-        if (shipmentData.status === "error") {
-          console.error("Error fetching package details");
-          return;
-        }
-
-        setShipment(shipmentData.data.shipment);
+        setShipment(fetchShipmentRes.data.shipment);
       } catch (error) {
         console.error("Error fetching package details", error);
       } finally {

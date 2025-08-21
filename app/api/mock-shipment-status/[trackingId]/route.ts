@@ -7,10 +7,12 @@ import {
 import { connectToDatabase } from "@/lib/mongodb";
 import MockStatus from "@/models/mock-status";
 
-export async function GET(req: Request) {
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ trackingId: string }> }
+) {
   try {
-    const { searchParams } = new URL(req.url);
-    const trackingId = searchParams.get("trackingId");
+    const { trackingId } = await params;
 
     if (!trackingId) {
       return handleMissingParamsError("trackingId is required");

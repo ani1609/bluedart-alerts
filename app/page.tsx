@@ -3,8 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Shipment } from "@/types/shipment";
-import { ShipmentsResponse } from "@/types/shipment";
-import axios from "axios";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { EllipsisVertical } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { deleteShipment, fetchAllShipments } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function Home() {
   const [shipments, setShipments] = useState<Shipment[]>([]);
@@ -15,16 +22,9 @@ export default function Home() {
       setIsLoading(true);
 
       try {
-        const response = await axios.get("/api/shipments");
+        const shipmentRes = await fetchAllShipments();
 
-        const responseData: ShipmentsResponse = response.data;
-
-        if (responseData.status === "error") {
-          console.error("Error fetching packages");
-          return;
-        }
-
-        setShipments(responseData.data.shipments);
+        setShipments(shipmentRes.data.shipments);
       } catch (error) {
         console.error("Error fetching packages:", error);
       } finally {
@@ -34,6 +34,33 @@ export default function Home() {
 
     fetchPackages();
   }, []);
+
+  const handleCopy = async ({ trackingId }: { trackingId: string }) => {
+    if (!trackingId) {
+      toast("No Tracking ID: Tracking ID is not available.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(trackingId);
+      toast("Tracking ID copied to clipboard.");
+    } catch (err) {
+      toast.error("Copy failed: Unable to copy Tracking ID.");
+      console.error("Clipboard copy failed:", err);
+    }
+  };
+
+  const handleDeletePackage = async ({
+    trackingId,
+  }: {
+    trackingId: string;
+  }) => {
+    try {
+      await deleteShipment({ trackingId });
+    } catch (error) {
+      console.error("Error deleting package:", error);
+    }
+  };
 
   return (
     <main className="size-full flex justify-center items-center">
@@ -48,9 +75,47 @@ export default function Home() {
               // target="_blank"
               className="p-2"
             >
-              <li className="flex justify-between items-center px-4 py-2 border gap-x-6 rounded-md">
-                <span>{shipment.title}</span>
-                <span>{shipment.trackingId}</span>
+              <li className="flex justify-between items-center px-4 py-2 border gap-x-10 rounded-md">
+                <h1 className="font-medium">{shipment.title}</h1>
+
+                <div
+                  className="flex items-center justify-center"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
+                  <Popover>
+                    <PopoverTrigger className="p-1">
+                      <EllipsisVertical className="size-5" />
+                    </PopoverTrigger>
+                    <PopoverContent
+                      side="right"
+                      className="w-auto p-0 flex flex-col overflow-hidden"
+                    >
+                      <Button
+                        variant="ghost"
+                        className="rounded-none"
+                        onClick={() =>
+                          handleCopy({ trackingId: shipment.trackingId })
+                        }
+                      >
+                        Copy Tracking ID
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        className="rounded-none"
+                        onClick={() =>
+                          handleDeletePackage({
+                            trackingId: shipment.trackingId,
+                          })
+                        }
+                      >
+                        Delete Package
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </li>
             </Link>
           ))}

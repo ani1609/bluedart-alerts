@@ -9,6 +9,7 @@ import axios from "axios";
 import { clsx, type ClassValue } from "clsx";
 import { NextResponse } from "next/server";
 import { twMerge } from "tailwind-merge";
+import { toast } from "sonner";
 
 const BASE_URL = process.env.BASE_URL || "";
 
@@ -73,19 +74,21 @@ export function handleInternalServerError(message: string): NextResponse {
   );
 }
 
-export const fetchShipments = async (): Promise<ShipmentsResponse> => {
+// Fetch all shipments
+export const fetchAllShipments = async (): Promise<ShipmentsResponse> => {
   try {
-    const response = await axios.get(`${BASE_URL}/api/shipments`);
+    const response = await axios.get(`${BASE_URL}/api/shipment`);
 
     if (response.status !== 200) {
       throw new Error("Failed to fetch shipments");
     }
 
     const data: ShipmentsResponse = response.data;
-
+    toast.success("Shipments loaded successfully");
     return data;
   } catch (error) {
     console.error("Failed to fetch shipments:", error);
+    toast.error("Failed to fetch shipments");
     return {
       status: "error",
       data: { shipments: [] },
@@ -93,25 +96,25 @@ export const fetchShipments = async (): Promise<ShipmentsResponse> => {
   }
 };
 
+// Fetch a single shipment by trackingId
 export const fetchShipment = async ({
   trackingId,
 }: {
   trackingId: string;
 }): Promise<ShipmentResponse> => {
   try {
-    const response = await axios.get(
-      `${BASE_URL}/api/shipment?trackingId=${trackingId}`
-    );
+    const response = await axios.get(`${BASE_URL}/api/shipment/${trackingId}`);
 
     if (response.status !== 200) {
       throw new Error("Failed to fetch shipment");
     }
 
     const data: ShipmentResponse = response.data;
-
+    toast.success("Shipment loaded successfully");
     return data;
   } catch (error) {
     console.error("Failed to fetch shipment:", error);
+    toast.error("Failed to fetch shipment");
     return {
       status: "error",
       data: { shipment: null },
@@ -119,6 +122,20 @@ export const fetchShipment = async ({
   }
 };
 
+// Delete a shipment
+export const deleteShipment = async ({
+  trackingId,
+}: {
+  trackingId: string;
+}): Promise<void> => {
+  toast.promise(axios.delete(`${BASE_URL}/api/shipment/${trackingId}`), {
+    loading: "Deleting shipment...",
+    success: "Shipment deleted successfully",
+    error: "Failed to delete shipment",
+  });
+};
+
+// Fetch shipment status from tracking API
 export async function fetchShipmentStatus({
   trackingId,
 }: ShipmentStatusRequest): Promise<ShipmentStatusResponse> {
@@ -132,10 +149,11 @@ export async function fetchShipmentStatus({
     }
 
     const data: ShipmentStatusResponse = eventsRes.data;
-
+    toast.success("Shipment status fetched successfully");
     return data;
   } catch (error) {
     console.error("Failed to fetch shipment status:", error);
+    toast.error("Failed to fetch shipment status");
     return {
       status: "error",
       data: {
@@ -146,6 +164,7 @@ export async function fetchShipmentStatus({
   }
 }
 
+// Send a Discord message
 export async function sendMessage({
   userDiscordId,
   message,
@@ -161,10 +180,11 @@ export async function sendMessage({
     }
 
     const data: SendMessageResponse = response.data;
-
+    toast.success("Message sent successfully");
     return data;
   } catch (error) {
     console.error("Failed to send Discord message:", error);
+    toast.error("Failed to send Discord message");
     return {
       status: "error",
       data: { message: "Failed to send Discord message" },
