@@ -4,8 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-import { AddShipmentRequest, AddShipmentResponse } from "@/types/shipment";
+import { addShipment } from "@/lib/utils";
 
 interface AddPackageCompProps {
   userDiscordId: string;
@@ -15,8 +14,6 @@ export default function AddPackageComp({ userDiscordId }: AddPackageCompProps) {
   const [packageId, setPackageId] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [discordId, setDiscordId] = useState<string>(userDiscordId);
-  const [error, setError] = useState<string | null>(null);
-  const [succes, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
@@ -25,46 +22,22 @@ export default function AddPackageComp({ userDiscordId }: AddPackageCompProps) {
 
     try {
       setIsLoading(true);
-      setSuccess(null);
-      setError(null);
 
-      const apibody: AddShipmentRequest = {
+      await addShipment({
         title,
         trackingId: packageId,
         userDiscordId: discordId,
-      };
+      });
 
-      const addShipmentRes = await axios.post("/api/add-shipment", apibody);
-
-      if (addShipmentRes.status === 404) {
-        setError("Shipment with this tracking ID already exists.");
-        return;
-      }
-
-      if (addShipmentRes.status !== 200) {
-        setError("An error occurred. Please try again later.");
-        return;
-      }
-
-      const addShipmentData: AddShipmentResponse = await addShipmentRes.data;
-
-      if (addShipmentData.status === "error") {
-        setError("An error occurred. Please try again later.");
-        return;
-      }
-
-      setError(null);
       setPackageId("");
       // setEmail("");
       setIsLoading(false);
-      setSuccess("Package added successfully");
 
       setTimeout(() => {
         router.push("/");
       }, 1000);
     } catch (error) {
       console.error("Error adding shipment: ", error);
-      setError("An error occurred. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -109,10 +82,6 @@ export default function AddPackageComp({ userDiscordId }: AddPackageCompProps) {
           required
           disabled={isLoading}
         />
-
-        {error && <p className="text-red-500 mt-3 text-sm">{error}</p>}
-
-        {succes && <p className="text-green-500 mt-3 text-sm">{succes}</p>}
 
         <Button type="submit" className="mt-6" disabled={isLoading}>
           Add Package

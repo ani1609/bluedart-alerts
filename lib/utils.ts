@@ -1,5 +1,7 @@
 import { SendMessageRequest, SendMessageResponse } from "@/types/message";
 import {
+  AddShipmentRequest,
+  AddShipmentResponse,
   ShipmentResponse,
   ShipmentsResponse,
   ShipmentStatusRequest,
@@ -17,6 +19,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Handle API errors
 export function handleApiError(error: unknown): NextResponse {
   const errorMessage =
     error instanceof Error ? error.message : "An unknown error occurred";
@@ -84,15 +87,33 @@ export const fetchAllShipments = async (): Promise<ShipmentsResponse> => {
     }
 
     const data: ShipmentsResponse = response.data;
-    toast.success("Shipments loaded successfully");
     return data;
   } catch (error) {
     console.error("Failed to fetch shipments:", error);
-    toast.error("Failed to fetch shipments");
     return {
       status: "error",
       data: { shipments: [] },
     };
+  }
+};
+
+// Add a shipment
+export const addShipment = async ({
+  title,
+  trackingId,
+  userDiscordId,
+}: AddShipmentRequest): Promise<AddShipmentResponse> => {
+  try {
+    const response = await axios.post(`${BASE_URL}/api/shipment`, {
+      title,
+      trackingId,
+      userDiscordId,
+    });
+
+    return response.data as AddShipmentResponse;
+  } catch (error) {
+    console.error("Failed to add shipment:", error);
+    throw error; // rethrow so caller can handle
   }
 };
 
@@ -110,11 +131,9 @@ export const fetchShipment = async ({
     }
 
     const data: ShipmentResponse = response.data;
-    toast.success("Shipment loaded successfully");
     return data;
   } catch (error) {
     console.error("Failed to fetch shipment:", error);
-    toast.error("Failed to fetch shipment");
     return {
       status: "error",
       data: { shipment: null },
@@ -128,11 +147,12 @@ export const deleteShipment = async ({
 }: {
   trackingId: string;
 }): Promise<void> => {
-  toast.promise(axios.delete(`${BASE_URL}/api/shipment/${trackingId}`), {
-    loading: "Deleting shipment...",
-    success: "Shipment deleted successfully",
-    error: "Failed to delete shipment",
-  });
+  try {
+    await axios.delete(`${BASE_URL}/api/shipment/${trackingId}`);
+  } catch (error) {
+    console.error("Failed to delete shipment:", error);
+    throw error;
+  }
 };
 
 // Fetch shipment status from tracking API
@@ -141,7 +161,7 @@ export async function fetchShipmentStatus({
 }: ShipmentStatusRequest): Promise<ShipmentStatusResponse> {
   try {
     const eventsRes = await axios.get(
-      `${BASE_URL}/api/shipment-status?trackingId=${trackingId}`
+      `${BASE_URL}/api/shipment-status/${trackingId}`
     );
 
     if (eventsRes.status !== 200) {
@@ -149,11 +169,9 @@ export async function fetchShipmentStatus({
     }
 
     const data: ShipmentStatusResponse = eventsRes.data;
-    toast.success("Shipment status fetched successfully");
     return data;
   } catch (error) {
     console.error("Failed to fetch shipment status:", error);
-    toast.error("Failed to fetch shipment status");
     return {
       status: "error",
       data: {
@@ -180,11 +198,9 @@ export async function sendMessage({
     }
 
     const data: SendMessageResponse = response.data;
-    toast.success("Message sent successfully");
     return data;
   } catch (error) {
     console.error("Failed to send Discord message:", error);
-    toast.error("Failed to send Discord message");
     return {
       status: "error",
       data: { message: "Failed to send Discord message" },

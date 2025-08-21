@@ -12,6 +12,7 @@ import { EllipsisVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteShipment, fetchAllShipments } from "@/lib/utils";
 import { toast } from "sonner";
+import { set } from "mongoose";
 
 export default function Home() {
   const [shipments, setShipments] = useState<Shipment[]>([]);
@@ -57,6 +58,10 @@ export default function Home() {
   }) => {
     try {
       await deleteShipment({ trackingId });
+
+      setShipments((prevShipments) =>
+        prevShipments.filter((shipment) => shipment.trackingId !== trackingId)
+      );
     } catch (error) {
       console.error("Error deleting package:", error);
     }
