@@ -9,7 +9,7 @@ export default function Navbar() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="w-screen px-5 py-10 sm:px-20 sm:py-10 flex justify-between items-center">
+    <div className="w-full px-5 py-10 sm:px-20 flex justify-between items-center">
       <div className="flex justify-start items-center gap-x-5 sm:gap-x-10">
         <Link href="/" className="px-4 py-2 border rounded">
           Home
