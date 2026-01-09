@@ -1,4 +1,4 @@
-# BlueDart Discord Tracker 📦
+# Blue Dart Discord Tracker 📦
 
 Get instant Discord notifications for your BlueDart package tracking updates.
 
