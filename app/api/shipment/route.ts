@@ -35,6 +35,7 @@ export async function POST(req: Request) {
   try {
     await connectToDatabase();
 
+    // Authenticate request
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.replace("Bearer ", "");
 
@@ -52,7 +53,7 @@ export async function POST(req: Request) {
     // Validate input
     if (!trackingId || !userDiscordId || !title) {
       return handleMissingParamsError(
-        "Missing required fields ( trackingId, userDiscordId, title )",
+        "Missing required fields ( trackingId, userDiscordId, title )"
       );
     }
 

@@ -22,10 +22,10 @@ export default function AddPackageComp() {
       setIsLoading(true);
 
       const promise = addShipment({
-        title,
-        trackingId: packageId,
-        userDiscordId: discordId,
-        authToken,
+        title: title.trim(),
+        trackingId: packageId.trim(),
+        userDiscordId: discordId.trim(),
+        authToken: authToken.trim(),
       });
 
       toast.promise(promise, {
