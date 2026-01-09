@@ -11,7 +11,6 @@ import {
 } from "@/types/shipment";
 import axios from "axios";
 import { clsx, type ClassValue } from "clsx";
-import { Delete } from "lucide-react";
 import { NextResponse } from "next/server";
 import { twMerge } from "tailwind-merge";
 
@@ -33,7 +32,7 @@ export function handleApiError(error: unknown): NextResponse {
         message: errorMessage,
       },
     },
-    { status: 500 },
+    { status: 500 }
   );
 }
 
@@ -47,13 +46,13 @@ export function handleMissingParamsError(message: string): NextResponse {
         message,
       },
     },
-    { status: 400 },
+    { status: 400 }
   );
 }
 
 // Handle authentication / authorization error
 export function handleAuthError(
-  message = "Invalid or missing auth token",
+  message = "Invalid or missing auth token"
 ): NextResponse {
   return NextResponse.json(
     {
@@ -63,7 +62,7 @@ export function handleAuthError(
         message,
       },
     },
-    { status: 401 },
+    { status: 401 }
   );
 }
 
@@ -77,7 +76,7 @@ export function handleResourceNotFoundError(message: string): NextResponse {
         message,
       },
     },
-    { status: 404 },
+    { status: 404 }
   );
 }
 
@@ -91,7 +90,7 @@ export function handleInternalServerError(message: string): NextResponse {
         message,
       },
     },
-    { status: 500 },
+    { status: 500 }
   );
 }
 
@@ -134,7 +133,7 @@ export const addShipment = async ({
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
-      },
+      }
     );
 
     return response.data as AddShipmentResponse;
@@ -193,7 +192,7 @@ export async function fetchShipmentStatus({
 }: ShipmentStatusRequest): Promise<ShipmentStatusResponse> {
   try {
     const eventsRes = await axios.get(
-      `${BASE_URL}/api/shipment-status/${trackingId}`,
+      `${BASE_URL}/api/shipment-status/${trackingId}`
     );
 
     if (eventsRes.status !== 200) {

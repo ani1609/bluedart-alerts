@@ -19,7 +19,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 
 export default function Home() {
@@ -28,7 +27,7 @@ export default function Home() {
   const [open, setOpen] = useState(false);
   const [authToken, setAuthToken] = useState("");
   const [selectedTrackingId, setSelectedTrackingId] = useState<string | null>(
-    null,
+    null
   );
 
   useEffect(() => {
@@ -81,7 +80,7 @@ export default function Home() {
     try {
       await promise;
       setShipments((prev) =>
-        prev.filter((s) => s.trackingId !== selectedTrackingId),
+        prev.filter((s) => s.trackingId !== selectedTrackingId)
       );
       setOpen(false);
       setAuthToken("");
