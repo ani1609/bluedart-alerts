@@ -2,6 +2,8 @@ import { SendMessageRequest, SendMessageResponse } from "@/types/message";
 import {
   AddShipmentRequest,
   AddShipmentResponse,
+  DeleteShipmentRequest,
+  DeleteShipmentResponse,
   ShipmentResponse,
   ShipmentsResponse,
   ShipmentStatusRequest,
@@ -168,11 +170,16 @@ export const fetchShipment = async ({
 // Delete a shipment
 export const deleteShipment = async ({
   trackingId,
-}: {
-  trackingId: string;
-}): Promise<void> => {
+  authToken,
+}: DeleteShipmentRequest): Promise<DeleteShipmentResponse> => {
   try {
-    await axios.delete(`${BASE_URL}/api/shipment/${trackingId}`);
+    const res = await axios.delete(`${BASE_URL}/api/shipment/${trackingId}`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    return res.data as DeleteShipmentResponse;
   } catch (error) {
     console.error("Failed to delete shipment:", error);
     throw error;

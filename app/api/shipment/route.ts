@@ -35,6 +35,7 @@ export async function POST(req: Request) {
   try {
     await connectToDatabase();
 
+    // Authenticate request
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.replace("Bearer ", "");
 

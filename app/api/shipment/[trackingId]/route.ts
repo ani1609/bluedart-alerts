@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Shipment from "@/models/shipment";
-import { handleApiError, handleResourceNotFoundError } from "@/lib/utils";
+import {
+  handleApiError,
+  handleAuthError,
+  handleResourceNotFoundError,
+} from "@/lib/utils";
 import { ShipmentResponse } from "@/types/shipment";
 
 export async function GET(
@@ -15,6 +19,7 @@ export async function GET(
 
     const shipment = await Shipment.findOne({ trackingId });
     if (!shipment) {
+      console.log("Shipment not found", trackingId);
       return handleResourceNotFoundError("Shipment not found");
     }
 
@@ -34,6 +39,19 @@ export async function DELETE(
 ) {
   try {
     await connectToDatabase();
+
+    // Authenticate request
+    const authHeader = req.headers.get("authorization");
+    const token = authHeader?.replace("Bearer ", "");
+
+    if (!token) {
+      return handleAuthError("Auth token missing");
+    }
+
+    if (token !== process.env.AUTH_TOKEN) {
+      return handleAuthError("Invalid auth token");
+    }
+
     const { trackingId } = await params;
 
     const deleted = await Shipment.findOneAndDelete({ trackingId });

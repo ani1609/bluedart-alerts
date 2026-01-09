@@ -27,6 +27,18 @@ export interface AddShipmentResponse {
   };
 }
 
+export interface DeleteShipmentRequest {
+  trackingId: string;
+  authToken: string;
+}
+
+export interface DeleteShipmentResponse {
+  status: Status;
+  data: {
+    message: string;
+  };
+}
+
 export interface ShipmentStatusRequest {
   trackingId: string;
 }

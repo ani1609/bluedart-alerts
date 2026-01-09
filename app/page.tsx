@@ -12,10 +12,23 @@ import { EllipsisVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { deleteShipment, fetchAllShipments } from "@/lib/utils";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function Home() {
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [open, setOpen] = useState(false);
+  const [authToken, setAuthToken] = useState("");
+  const [selectedTrackingId, setSelectedTrackingId] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const fetchPackages = async () => {
@@ -50,28 +63,34 @@ export default function Home() {
     }
   };
 
-  const handleDeletePackage = async ({
-    trackingId,
-  }: {
-    trackingId: string;
-  }) => {
-    try {
-      toast.promise(deleteShipment({ trackingId }), {
-        loading: "Deleting package...",
-        success: "Package has been deleted",
-        error: "Error deleting package",
-      });
+  const handleConfirmDelete = async () => {
+    if (!selectedTrackingId) return;
 
-      setShipments((prevShipments) =>
-        prevShipments.filter((shipment) => shipment.trackingId !== trackingId),
+    const promise = deleteShipment({
+      trackingId: selectedTrackingId,
+      authToken: authToken.trim(),
+    });
+
+    toast.promise(promise, {
+      loading: "Deleting package...",
+      success: "Package deleted",
+      error: "Invalid auth token or delete failed",
+    });
+
+    try {
+      await promise;
+      setShipments((prev) =>
+        prev.filter((s) => s.trackingId !== selectedTrackingId),
       );
+      setOpen(false);
+      setAuthToken("");
     } catch (error) {
       console.error("Error deleting package:", error);
     }
   };
 
   return (
-    <main className="size-full flex justify-center items-center">
+    <main className="size-full flex justify-center items-center px-4 sm:px-6 lg:px-8">
       {isLoading ? (
         <p>Loading packages...</p>
       ) : shipments && shipments.length > 0 ? (
@@ -81,7 +100,7 @@ export default function Home() {
               key={index}
               href={`/shipment/${shipment.trackingId}`}
               // target="_blank"
-              className="p-2"
+              className="p-1"
             >
               <li className="flex justify-between items-center px-4 py-2 border gap-x-10 rounded-md">
                 <h1 className="font-medium">{shipment.title}</h1>
@@ -113,11 +132,10 @@ export default function Home() {
                       <Button
                         variant="destructive"
                         className="rounded-none"
-                        onClick={() =>
-                          handleDeletePackage({
-                            trackingId: shipment.trackingId,
-                          })
-                        }
+                        onClick={() => {
+                          setSelectedTrackingId(shipment.trackingId);
+                          setOpen(true);
+                        }}
                       >
                         Delete Package
                       </Button>
@@ -131,6 +149,40 @@ export default function Home() {
       ) : (
         <p>No packages found</p>
       )}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogDescription>
+              Enter auth token to delete this package.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Input
+            type="password"
+            placeholder="Auth token"
+            value={authToken}
+            onChange={(e) => setAuthToken(e.target.value)}
+            className="mt-4"
+          />
+
+          <div className="flex justify-end gap-2 mt-6">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setOpen(false);
+                setAuthToken("");
+              }}
+            >
+              Cancel
+            </Button>
+
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Confirm Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
