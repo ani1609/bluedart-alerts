@@ -9,7 +9,7 @@ import { Event, ShipmentStatusResponse } from "@/types/shipment";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ trackingId: string }> }
+  { params }: { params: Promise<{ trackingId: string }> },
 ) {
   try {
     const { trackingId } = await params;
@@ -19,7 +19,7 @@ export async function GET(
     }
 
     const response = await fetch(
-      `https://www.bluedart.com/web/guest/trackdartresultthirdparty?trackFor=0&trackNo=${trackingId}`
+      `https://www.bluedart.com/web/guest/trackdartresultthirdparty?trackFor=0&trackNo=${trackingId}`,
     );
 
     if (!response.ok) {
@@ -37,7 +37,7 @@ export async function GET(
 
     const targetTable = $("table")
       .filter(
-        (_, el) => $(el).find('th:contains("Status and Scans")').length > 0
+        (_, el) => $(el).find('th:contains("Status and Scans")').length > 0,
       )
       .first();
 
@@ -72,7 +72,7 @@ export async function GET(
   } catch (error: unknown) {
     console.error("Error fetching data:", error);
     return handleInternalServerError(
-      "An error occurred while fetching the tracking data."
+      "An error occurred while fetching the tracking data.",
     );
   }
 }

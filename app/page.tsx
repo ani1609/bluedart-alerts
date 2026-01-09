@@ -63,7 +63,7 @@ export default function Home() {
       });
 
       setShipments((prevShipments) =>
-        prevShipments.filter((shipment) => shipment.trackingId !== trackingId)
+        prevShipments.filter((shipment) => shipment.trackingId !== trackingId),
       );
     } catch (error) {
       console.error("Error deleting package:", error);

@@ -17,7 +17,7 @@ const MockStatusSchema = new Schema<MockEvent>(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.models.MockStatus ||

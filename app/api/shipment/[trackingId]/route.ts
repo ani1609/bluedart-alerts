@@ -6,7 +6,7 @@ import { ShipmentResponse } from "@/types/shipment";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ trackingId: string }> }
+  { params }: { params: Promise<{ trackingId: string }> },
 ) {
   try {
     await connectToDatabase();
@@ -30,7 +30,7 @@ export async function GET(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ trackingId: string }> }
+  { params }: { params: Promise<{ trackingId: string }> },
 ) {
   try {
     await connectToDatabase();
@@ -43,7 +43,7 @@ export async function DELETE(
 
     return NextResponse.json(
       { status: "success", data: { message: "Shipment deleted successfully" } },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return handleApiError(error);

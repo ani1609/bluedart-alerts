@@ -13,7 +13,7 @@ Get instant Discord notifications for your BlueDart package tracking updates.
 1. **Install dependencies**
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. **Set up environment variables**
@@ -24,13 +24,13 @@ Get instant Discord notifications for your BlueDart package tracking updates.
    BASE_URL=
    MONGODB_URI=
    DISCORD_BOT_TOKEN=
-   USER_DISCORD_ID=
+   AUTH_TOKEN=
    ```
 
 3. **Run the app**
 
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 
 4. **Use the app**

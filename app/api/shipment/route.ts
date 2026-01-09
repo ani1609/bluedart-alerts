@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   handleApiError,
+  handleAuthError,
   handleMissingParamsError,
   handleResourceNotFoundError,
 } from "@/lib/utils";
@@ -34,13 +35,24 @@ export async function POST(req: Request) {
   try {
     await connectToDatabase();
 
+    const authHeader = req.headers.get("authorization");
+    const token = authHeader?.replace("Bearer ", "");
+
+    if (!token) {
+      return handleAuthError("Auth token missing");
+    }
+
+    if (token !== process.env.AUTH_TOKEN) {
+      return handleAuthError("Invalid auth token");
+    }
+
     const body: AddShipmentRequest = await req.json();
     const { title, trackingId, userDiscordId } = body;
 
     // Validate input
     if (!trackingId || !userDiscordId || !title) {
       return handleMissingParamsError(
-        "Missing required fields ( trackingId, userDiscordId, title )"
+        "Missing required fields ( trackingId, userDiscordId, title )",
       );
     }
 
