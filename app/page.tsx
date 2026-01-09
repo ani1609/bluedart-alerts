@@ -28,7 +28,7 @@ export default function Home() {
   const [open, setOpen] = useState(false);
   const [authToken, setAuthToken] = useState("");
   const [selectedTrackingId, setSelectedTrackingId] = useState<string | null>(
-    null
+    null,
   );
 
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function Home() {
     try {
       await promise;
       setShipments((prev) =>
-        prev.filter((s) => s.trackingId !== selectedTrackingId)
+        prev.filter((s) => s.trackingId !== selectedTrackingId),
       );
       setOpen(false);
       setAuthToken("");
@@ -91,7 +91,7 @@ export default function Home() {
   };
 
   return (
-    <main className="size-full flex justify-center items-center">
+    <main className="size-full flex justify-center items-center px-4 sm:px-6 lg:px-8">
       {isLoading ? (
         <p>Loading packages...</p>
       ) : shipments && shipments.length > 0 ? (
@@ -101,7 +101,7 @@ export default function Home() {
               key={index}
               href={`/shipment/${shipment.trackingId}`}
               // target="_blank"
-              className="p-2"
+              className="p-1"
             >
               <li className="flex justify-between items-center px-4 py-2 border gap-x-10 rounded-md">
                 <h1 className="font-medium">{shipment.title}</h1>
@@ -150,7 +150,6 @@ export default function Home() {
       ) : (
         <p>No packages found</p>
       )}
-
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>

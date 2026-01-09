@@ -53,7 +53,7 @@ export async function POST(req: Request) {
     // Validate input
     if (!trackingId || !userDiscordId || !title) {
       return handleMissingParamsError(
-        "Missing required fields ( trackingId, userDiscordId, title )"
+        "Missing required fields ( trackingId, userDiscordId, title )",
       );
     }
 
