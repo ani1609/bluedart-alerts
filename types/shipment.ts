@@ -17,6 +17,7 @@ export interface AddShipmentRequest {
   title: string;
   trackingId: string;
   userDiscordId: string;
+  authToken: string;
 }
 
 export interface AddShipmentResponse {

@@ -9,7 +9,7 @@ import MockStatus from "@/models/mock-status";
 
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ trackingId: string }> }
+  { params }: { params: Promise<{ trackingId: string }> },
 ) {
   try {
     const { trackingId } = await params;

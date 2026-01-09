@@ -30,7 +30,7 @@ export function handleApiError(error: unknown): NextResponse {
         message: errorMessage,
       },
     },
-    { status: 500 }
+    { status: 500 },
   );
 }
 
@@ -44,7 +44,23 @@ export function handleMissingParamsError(message: string): NextResponse {
         message,
       },
     },
-    { status: 400 }
+    { status: 400 },
+  );
+}
+
+// Handle authentication / authorization error
+export function handleAuthError(
+  message = "Invalid or missing auth token",
+): NextResponse {
+  return NextResponse.json(
+    {
+      status: "error",
+      data: {
+        type: "auth_error",
+        message,
+      },
+    },
+    { status: 401 },
   );
 }
 
@@ -58,7 +74,7 @@ export function handleResourceNotFoundError(message: string): NextResponse {
         message,
       },
     },
-    { status: 404 }
+    { status: 404 },
   );
 }
 
@@ -72,7 +88,7 @@ export function handleInternalServerError(message: string): NextResponse {
         message,
       },
     },
-    { status: 500 }
+    { status: 500 },
   );
 }
 
@@ -101,13 +117,22 @@ export const addShipment = async ({
   title,
   trackingId,
   userDiscordId,
+  authToken,
 }: AddShipmentRequest): Promise<AddShipmentResponse> => {
   try {
-    const response = await axios.post(`${BASE_URL}/api/shipment`, {
-      title,
-      trackingId,
-      userDiscordId,
-    });
+    const response = await axios.post(
+      `${BASE_URL}/api/shipment`,
+      {
+        title,
+        trackingId,
+        userDiscordId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      },
+    );
 
     return response.data as AddShipmentResponse;
   } catch (error) {
@@ -160,7 +185,7 @@ export async function fetchShipmentStatus({
 }: ShipmentStatusRequest): Promise<ShipmentStatusResponse> {
   try {
     const eventsRes = await axios.get(
-      `${BASE_URL}/api/shipment-status/${trackingId}`
+      `${BASE_URL}/api/shipment-status/${trackingId}`,
     );
 
     if (eventsRes.status !== 200) {

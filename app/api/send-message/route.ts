@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     // Validate input
     if (!userDiscordId || !message) {
       return handleMissingParamsError(
-        "userDiscordId (user ID) and message are required"
+        "userDiscordId (user ID) and message are required",
       );
     }
 

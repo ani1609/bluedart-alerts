@@ -8,7 +8,7 @@ export async function GET() {
         status: "success",
         data: { message: "Hello from Bluedart-Alerts!" },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     console.error("Error fetching data:", error);

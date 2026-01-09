@@ -38,7 +38,7 @@ export async function GET() {
         const newEvents = latestShipmentStatusData.data.events.slice(
           0,
           latestShipmentStatusData.data.events.length -
-            shipmentFromDb.events.length
+            shipmentFromDb.events.length,
         );
 
         // Prepend the new events to the existing events array in the DB
@@ -66,7 +66,7 @@ export async function GET() {
 
     return NextResponse.json(
       { status: "success", message: "Shipments checked and updated" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.log("Error fetching shipments:", error);

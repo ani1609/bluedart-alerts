@@ -20,7 +20,7 @@ const ShipmentSchema = new Schema<ShipmentInterface>(
     ],
     userDiscordId: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model<ShipmentInterface>("Shipment", ShipmentSchema);
