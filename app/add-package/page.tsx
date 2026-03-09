@@ -37,7 +37,7 @@ export default function AddPackageComp() {
       await promise;
 
       setTimeout(() => {
-        router.push("/");
+        router.push(`/shipment/${packageId.trim()}`);
       }, 1000);
     } catch (error) {
       console.error("Error adding shipment: ", error);

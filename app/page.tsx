@@ -20,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Home() {
   const [shipments, setShipments] = useState<Shipment[]>([]);
@@ -92,7 +93,18 @@ export default function Home() {
   return (
     <main className="size-full flex justify-center items-center px-4 sm:px-6 lg:px-8">
       {isLoading ? (
-        <p>Loading packages...</p>
+        <ul className="flex flex-col gap-y-4">
+          {/* gap-y is 4 and not 2 because we have a p-1 in the parcel items */}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <li
+              key={i}
+              className="flex justify-between items-center px-4 py-2 border gap-x-10 rounded-md"
+            >
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-7 w-7 rounded-md" />
+            </li>
+          ))}
+        </ul>
       ) : shipments && shipments.length > 0 ? (
         <ul className="flex flex-col gap-y-2">
           {shipments.map((shipment, index) => (
