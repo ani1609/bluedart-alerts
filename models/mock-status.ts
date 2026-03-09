@@ -8,6 +8,7 @@ if (mongoose.models.MockStatus) {
 const MockStatusSchema = new Schema<MockEvent>(
   {
     trackingId: { type: String, required: true, unique: true },
+    expectedDeliveryDate: { type: String, default: null },
     events: [
       {
         location: { type: String, required: true },

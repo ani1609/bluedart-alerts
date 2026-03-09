@@ -60,10 +60,23 @@ export async function GET(
       }
     });
 
+    // Extract expected delivery date from the shipment details table
+    let expectedDeliveryDate: string | null = null;
+    $("th")
+      .filter((_, el) => $(el).text().trim() === "Expected Date of Delivery")
+      .each((_, th) => {
+        const dateText = $(th).next("td").text().trim();
+        if (dateText) {
+          expectedDeliveryDate = dateText;
+          return false; // break
+        }
+      });
+
     const resPayload: ShipmentStatusResponse = {
       status: "success",
       data: {
         trackingId,
+        expectedDeliveryDate,
         events: tableData,
       },
     };
