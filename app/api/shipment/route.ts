@@ -53,7 +53,7 @@ export async function POST(req: Request) {
     // Validate input
     if (!trackingId || !userDiscordId || !title) {
       return handleMissingParamsError(
-        "Missing required fields ( trackingId, userDiscordId, title )",
+        "Missing required fields (trackingId, userDiscordId, title)",
       );
     }
 
@@ -78,6 +78,7 @@ export async function POST(req: Request) {
       title,
       trackingId: trackingId,
       userDiscordId: userDiscordId,
+      expectedDeliveryDate: shipmentStatus.data.expectedDeliveryDate,
       events: shipmentStatus.data.events,
     });
     if (!newShipment) {
@@ -89,6 +90,7 @@ export async function POST(req: Request) {
       `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `🚀  **Shipment Tracking Activated!**  🚀\n\n` +
       `Your shipment with tracking ID **${trackingId}** has been added for event alerts!\n\n` +
+      `Expected Delivery Date: ${shipmentStatus.data.expectedDeliveryDate || "Not specified"}\n\n` +
       `The latest event for your shipment **${title}** is:\n` +
       `📍  **Location:** ${shipmentStatus.data.events[0].location}\n` +
       `📝  **Details:** ${shipmentStatus.data.events[0].details}\n` +

@@ -5,9 +5,33 @@ import MockStatus from "@/models/mock-status";
 import { faker } from "@faker-js/faker";
 import { Event, ShipmentStatusResponse } from "@/types/shipment";
 
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function fakeFutureDate(): string {
+  const d = faker.date.future();
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 export async function POST(req: Request) {
   try {
-    const { trackingId, eventCount = 3 } = await req.json();
+    const {
+      trackingId,
+      eventCount = 3,
+      expectedDeliveryDate,
+    } = await req.json();
 
     if (!trackingId) {
       return handleMissingParamsError("trackingId is required");
@@ -28,11 +52,16 @@ export async function POST(req: Request) {
       // Create new document if tracking ID is not found
       mockStatus = new MockStatus({
         trackingId,
+        expectedDeliveryDate: expectedDeliveryDate ?? fakeFutureDate(),
         events: newEvents,
       });
     } else {
       // Prepend new events to the beginning of the array (that is how bluedart works)
       mockStatus.events.unshift(...newEvents);
+      // Update delivery date if explicitly provided, otherwise keep existing
+      if (expectedDeliveryDate !== undefined) {
+        mockStatus.expectedDeliveryDate = expectedDeliveryDate;
+      }
     }
 
     await mockStatus.save();
@@ -41,6 +70,7 @@ export async function POST(req: Request) {
       status: "success",
       data: {
         trackingId,
+        expectedDeliveryDate: mockStatus.expectedDeliveryDate,
         events: mockStatus.events,
       },
     };

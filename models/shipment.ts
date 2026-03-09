@@ -10,6 +10,7 @@ const ShipmentSchema = new Schema<ShipmentInterface>(
   {
     title: { type: String, required: true },
     trackingId: { type: String, required: true, unique: true },
+    expectedDeliveryDate: { type: String, default: null },
     events: [
       {
         location: { type: String, required: true },

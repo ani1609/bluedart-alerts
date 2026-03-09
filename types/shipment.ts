@@ -10,6 +10,7 @@ export interface Event {
 
 export interface MockEvent extends Document {
   trackingId: string;
+  expectedDeliveryDate: string | null;
   events: Event[];
 }
 
@@ -47,6 +48,7 @@ export interface ShipmentStatusResponse {
   status: Status;
   data: {
     trackingId: string;
+    expectedDeliveryDate: string | null;
     events: Event[];
   };
 }
@@ -54,6 +56,7 @@ export interface ShipmentStatusResponse {
 export interface Shipment extends Document {
   title: string;
   trackingId: string;
+  expectedDeliveryDate: string | null;
   events: Event[];
   userDiscordId: string;
 }

@@ -25,6 +25,7 @@ export default function PackageDetails({
       if (!trackingId) return;
 
       setIsLoading(true);
+
       try {
         const fetchShipmentRes = await fetchShipment({ trackingId });
 
@@ -45,6 +46,9 @@ export default function PackageDetails({
         <div className="w-full flex flex-col gap-y-6">
           <div className="flex flex-col gap-y-2">
             <p>Package ID: {trackingId}</p>
+            <p>
+              Expected Delivery Date: {shipment?.expectedDeliveryDate || "N/A"}
+            </p>
             <p>Total events- {shipment ? shipment.events.length : "N/A"}</p>
           </div>
 

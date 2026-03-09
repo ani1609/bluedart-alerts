@@ -207,6 +207,7 @@ export async function fetchShipmentStatus({
       status: "error",
       data: {
         trackingId,
+        expectedDeliveryDate: null,
         events: [],
       },
     };
