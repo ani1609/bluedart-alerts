@@ -13,6 +13,11 @@ import {
   ShipmentsResponse,
 } from "@/types/shipment";
 import { fetchShipmentStatus, sendMessage } from "@/lib/utils";
+import {
+  validateAuthToken,
+  validateAddShipmentBody,
+} from "@/lib/shipment-validators";
+import { buildAddShipmentMessage } from "@/lib/message-builders";
 
 export async function GET() {
   try {
@@ -36,22 +41,21 @@ export async function POST(req: Request) {
     await connectToDatabase();
 
     // Authenticate request
-    const authHeader = req.headers.get("authorization");
-    const token = authHeader?.replace("Bearer ", "");
-
-    if (!token) {
-      return handleAuthError("Auth token missing");
-    }
-
-    if (token !== process.env.AUTH_TOKEN) {
-      return handleAuthError("Invalid auth token");
+    const authResult = validateAuthToken(
+      req.headers.get("authorization"),
+      process.env.AUTH_TOKEN,
+    );
+    if (!authResult.valid) {
+      return authResult.reason === "missing"
+        ? handleAuthError("Auth token missing")
+        : handleAuthError("Invalid auth token");
     }
 
     const body: AddShipmentRequest = await req.json();
     const { title, trackingId, userDiscordId } = body;
 
     // Validate input
-    if (!trackingId || !userDiscordId || !title) {
+    if (!validateAddShipmentBody({ title, trackingId, userDiscordId })) {
       return handleMissingParamsError(
         "Missing required fields (trackingId, userDiscordId, title)",
       );
@@ -86,16 +90,12 @@ export async function POST(req: Request) {
     }
 
     // Notify user on Discord
-    const message =
-      `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `🚀  **Shipment Tracking Activated!**  🚀\n\n` +
-      `Your shipment with tracking ID **${trackingId}** has been added for event alerts!\n\n` +
-      `Expected Delivery Date: ${shipmentStatus.data.expectedDeliveryDate || "Not specified"}\n\n` +
-      `The latest event for your shipment **${title}** is:\n` +
-      `📍  **Location:** ${shipmentStatus.data.events[0].location}\n` +
-      `📝  **Details:** ${shipmentStatus.data.events[0].details}\n` +
-      `📅  **Date:** ${shipmentStatus.data.events[0].date}\n` +
-      `⏰  **Time:** ${shipmentStatus.data.events[0].time}`;
+    const message = buildAddShipmentMessage({
+      trackingId,
+      title,
+      expectedDeliveryDate: shipmentStatus.data.expectedDeliveryDate,
+      latestEvent: shipmentStatus.data.events[0],
+    });
 
     const discordMessageSent = await sendMessage({
       userDiscordId,

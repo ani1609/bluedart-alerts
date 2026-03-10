@@ -8,6 +8,10 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import Shipment from "@/models/shipment";
 import { resolveMonitoringAction } from "@/lib/monitoring-logic";
+import {
+  buildNewEventsMessage,
+  buildDateChangedMessage,
+} from "@/lib/message-builders";
 
 export async function GET() {
   try {
@@ -49,17 +53,12 @@ export async function GET() {
           shipmentFromDb.expectedDeliveryDate = updatedDeliveryDate;
         }
 
-        const message =
-          `\n━━━━━━━━━━━━━━━━━━━━━\n` +
-          `📦  **Shipment Update!**  📦\n\n` +
-          `🚚  Your shipment **${shipmentFromDb.title}** has new events:\n\n` +
-          `📍  **Location:** ${newEvents[0].location}\n` +
-          `📝  **Details:** ${newEvents[0].details}\n` +
-          `📅  **Date:** ${newEvents[0].date}\n` +
-          `⏰  **Time:** ${newEvents[0].time}\n` +
-          (updatedDeliveryDate
-            ? `📆  **Expected Delivery:** ${updatedDeliveryDate}\n`
-            : "");
+        const message = buildNewEventsMessage({
+          trackingId: shipmentFromDb.trackingId,
+          title: shipmentFromDb.title,
+          latestEvent: newEvents[0],
+          updatedDeliveryDate,
+        });
 
         await sendMessage({
           userDiscordId: shipmentFromDb.userDiscordId,
@@ -72,14 +71,12 @@ export async function GET() {
         const { previousDate, updatedDeliveryDate } = action;
         shipmentFromDb.expectedDeliveryDate = updatedDeliveryDate;
 
-        const message =
-          `\n━━━━━━━━━━━━━━━━━━━━━\n` +
-          `📦  **Shipment Update!**  📦\n\n` +
-          `🚚  Your shipment **${shipmentFromDb.title}** has an updated delivery date:\n\n` +
-          (previousDate
-            ? `📆  **Previous Delivery Date:** ${previousDate}\n`
-            : "") +
-          `📆  **New Expected Delivery:** ${updatedDeliveryDate}\n`;
+        const message = buildDateChangedMessage({
+          trackingId: shipmentFromDb.trackingId,
+          title: shipmentFromDb.title,
+          previousDate,
+          updatedDeliveryDate,
+        });
 
         await sendMessage({
           userDiscordId: shipmentFromDb.userDiscordId,
