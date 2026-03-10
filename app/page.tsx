@@ -91,14 +91,14 @@ export default function Home() {
   };
 
   return (
-    <main className="size-full flex justify-center items-center px-4 sm:px-6 lg:px-8">
+    <main className="flex size-full items-center justify-center px-4 sm:px-6 lg:px-8">
       {isLoading ? (
         <ul className="flex flex-col gap-y-4">
           {/* gap-y is 4 and not 2 because we have a p-1 in the parcel items */}
           {Array.from({ length: 5 }).map((_, i) => (
             <li
               key={i}
-              className="flex justify-between items-center px-4 py-2 border gap-x-10 rounded-md"
+              className="flex items-center justify-between gap-x-10 rounded-md border px-4 py-2"
             >
               <Skeleton className="h-5 w-40" />
               <Skeleton className="h-7 w-7 rounded-md" />
@@ -114,7 +114,7 @@ export default function Home() {
               // target="_blank"
               className="p-1"
             >
-              <li className="flex justify-between items-center px-4 py-2 border gap-x-10 rounded-md">
+              <li className="flex items-center justify-between gap-x-10 rounded-md border px-4 py-2">
                 <h1 className="font-medium">{shipment.title}</h1>
 
                 <div
@@ -130,7 +130,7 @@ export default function Home() {
                     </PopoverTrigger>
                     <PopoverContent
                       side="right"
-                      className="w-auto p-0 flex flex-col overflow-hidden"
+                      className="flex w-auto flex-col overflow-hidden p-0"
                     >
                       <Button
                         variant="ghost"
@@ -178,7 +178,7 @@ export default function Home() {
             className="mt-4"
           />
 
-          <div className="flex justify-end gap-2 mt-6">
+          <div className="mt-6 flex justify-end gap-2">
             <Button
               variant="ghost"
               onClick={() => {

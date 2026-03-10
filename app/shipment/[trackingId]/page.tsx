@@ -42,9 +42,9 @@ export default function PackageDetails({
   }, [trackingId]);
 
   return (
-    <main className="size-full flex justify-center items-start px-5 sm:px-20">
+    <main className="flex size-full items-start justify-center px-5 sm:px-20">
       {!isLoading ? (
-        <div className="w-full flex flex-col gap-y-6">
+        <div className="flex w-full flex-col gap-y-6">
           <div className="flex flex-col gap-y-2">
             <p>Package ID: {trackingId}</p>
             <p>Title: {shipment?.title || "N/A"}</p>
@@ -55,7 +55,7 @@ export default function PackageDetails({
           </div>
 
           {shipment && shipment.events.length > 0 ? (
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 max-h-[calc(100dvh-12.814rem)] pr-1 overflow-auto  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+            <div className="grid max-h-[calc(100dvh-12.814rem)] grid-cols-1 gap-4 overflow-auto pr-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700">
               {shipment.events.map((event, index) => (
                 <Card key={index} className="w-full">
                   <CardHeader className="p-4">
@@ -77,14 +77,14 @@ export default function PackageDetails({
           )}
         </div>
       ) : (
-        <div className="w-full flex flex-col gap-y-6">
+        <div className="flex w-full flex-col gap-y-6">
           <div className="flex flex-col gap-y-2">
             <Skeleton className="h-5 w-48" />
             <Skeleton className="h-5 w-64" />
             <Skeleton className="h-5 w-32" />
           </div>
 
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 max-h-[calc(100dvh-12.814rem)] pr-1 overflow-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+          <div className="grid max-h-[calc(100dvh-12.814rem)] grid-cols-1 gap-4 overflow-auto pr-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700">
             {Array.from({ length: 10 }).map((_, i) => (
               <Card key={i} className="w-full">
                 <CardHeader className="p-4">

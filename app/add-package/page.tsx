@@ -47,12 +47,12 @@ export default function AddPackageComp() {
   };
 
   return (
-    <main className="size-full flex justify-center items-center px-6">
+    <main className="flex size-full items-center justify-center px-6">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col items-start justify-start sm:w-96 w-full"
+        className="flex w-full flex-col items-start justify-start sm:w-96"
       >
-        <h1 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+        <h1 className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           Add Package
         </h1>
 

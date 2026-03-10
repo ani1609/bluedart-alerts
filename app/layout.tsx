@@ -32,7 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <main className="w-dvw h-dvh flex flex-col overflow-hidden">
+          <main className="flex h-dvh w-dvw flex-col overflow-hidden">
             <Navbar />
             <div className="w-full flex-1">{children}</div>
           </main>
