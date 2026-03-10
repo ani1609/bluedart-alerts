@@ -7,6 +7,7 @@ import {
   handleResourceNotFoundError,
 } from "@/lib/utils";
 import { ShipmentResponse } from "@/types/shipment";
+import { validateAuthToken } from "@/lib/shipment-validators";
 
 export async function GET(
   req: Request,
@@ -41,15 +42,14 @@ export async function DELETE(
     await connectToDatabase();
 
     // Authenticate request
-    const authHeader = req.headers.get("authorization");
-    const token = authHeader?.replace("Bearer ", "");
-
-    if (!token) {
-      return handleAuthError("Auth token missing");
-    }
-
-    if (token !== process.env.AUTH_TOKEN) {
-      return handleAuthError("Invalid auth token");
+    const authResult = validateAuthToken(
+      req.headers.get("authorization"),
+      process.env.AUTH_TOKEN,
+    );
+    if (!authResult.valid) {
+      return authResult.reason === "missing"
+        ? handleAuthError("Auth token missing")
+        : handleAuthError("Invalid auth token");
     }
 
     const { trackingId } = await params;

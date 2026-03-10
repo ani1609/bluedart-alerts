@@ -7,6 +7,11 @@ import {
 import { connectToDatabase } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import Shipment from "@/models/shipment";
+import { resolveMonitoringAction } from "@/lib/monitoring-logic";
+import {
+  buildNewEventsMessage,
+  buildDateChangedMessage,
+} from "@/lib/message-builders";
 
 export async function GET() {
   try {
@@ -31,34 +36,29 @@ export async function GET() {
       const latestExpectedDeliveryDate =
         latestShipmentStatusData.data.expectedDeliveryDate;
       const currentExpectedDeliveryDate = shipmentFromDb.expectedDeliveryDate;
-      const deliveryDateChanged =
-        latestExpectedDeliveryDate !== currentExpectedDeliveryDate;
 
-      const hasNewEvents =
-        latestShipmentStatusData.data.events.length >
-        shipmentFromDb.events.length;
+      const action = resolveMonitoringAction({
+        storedEvents: shipmentFromDb.events,
+        storedDeliveryDate: currentExpectedDeliveryDate,
+        latestEvents: latestShipmentStatusData.data.events,
+        latestDeliveryDate: latestExpectedDeliveryDate,
+      });
 
-      if (hasNewEvents) {
-        const newEvents = latestShipmentStatusData.data.events.slice(
-          0,
-          latestShipmentStatusData.data.events.length -
-            shipmentFromDb.events.length,
-        );
+      if (action.type === "new_events") {
+        const { newEvents, updatedDeliveryDate } = action;
 
         shipmentFromDb.events = [...newEvents, ...shipmentFromDb.events];
-        shipmentFromDb.expectedDeliveryDate = latestExpectedDeliveryDate;
+        // Never overwrite a known date with null (scraping fluke guard)
+        if (updatedDeliveryDate !== null) {
+          shipmentFromDb.expectedDeliveryDate = updatedDeliveryDate;
+        }
 
-        const message =
-          `\n━━━━━━━━━━━━━━━━━━━━━\n` +
-          `📦  **Shipment Update!**  📦\n\n` +
-          `🚚  Your shipment **${shipmentFromDb.title}** has new events:\n\n` +
-          `📍  **Location:** ${newEvents[0].location}\n` +
-          `📝  **Details:** ${newEvents[0].details}\n` +
-          `📅  **Date:** ${newEvents[0].date}\n` +
-          `⏰  **Time:** ${newEvents[0].time}\n` +
-          (latestExpectedDeliveryDate
-            ? `📆  **Expected Delivery:** ${latestExpectedDeliveryDate}\n`
-            : "");
+        const message = buildNewEventsMessage({
+          trackingId: shipmentFromDb.trackingId,
+          title: shipmentFromDb.title,
+          latestEvent: newEvents[0],
+          updatedDeliveryDate,
+        });
 
         await sendMessage({
           userDiscordId: shipmentFromDb.userDiscordId,
@@ -66,20 +66,17 @@ export async function GET() {
         });
 
         await shipmentFromDb.save();
-      } else if (deliveryDateChanged) {
-        // No new scan events, but delivery date changed (or became available for the first time)
-        shipmentFromDb.expectedDeliveryDate = latestExpectedDeliveryDate;
+      } else if (action.type === "date_changed") {
+        // Delivery date changed or became available for the first time
+        const { previousDate, updatedDeliveryDate } = action;
+        shipmentFromDb.expectedDeliveryDate = updatedDeliveryDate;
 
-        const message =
-          `\n━━━━━━━━━━━━━━━━━━━━━\n` +
-          `📦  **Shipment Update!**  📦\n\n` +
-          `🚚  Your shipment **${shipmentFromDb.title}** has an updated delivery date:\n\n` +
-          (currentExpectedDeliveryDate
-            ? `📆  **Previous Delivery Date:** ${currentExpectedDeliveryDate}\n`
-            : "") +
-          (latestExpectedDeliveryDate
-            ? `📆  **New Expected Delivery:** ${latestExpectedDeliveryDate}\n`
-            : `📆  **Expected Delivery Date:** Not available yet\n`);
+        const message = buildDateChangedMessage({
+          trackingId: shipmentFromDb.trackingId,
+          title: shipmentFromDb.title,
+          previousDate,
+          updatedDeliveryDate,
+        });
 
         await sendMessage({
           userDiscordId: shipmentFromDb.userDiscordId,

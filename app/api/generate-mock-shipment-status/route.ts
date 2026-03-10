@@ -4,6 +4,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import MockStatus from "@/models/mock-status";
 import { faker } from "@faker-js/faker";
 import { Event, ShipmentStatusResponse } from "@/types/shipment";
+import { resolveMockDeliveryDate } from "@/lib/mock-status-logic";
 
 const MONTHS = [
   "Jan",
@@ -49,19 +50,25 @@ export async function POST(req: Request) {
     }));
 
     if (!mockStatus) {
-      // Create new document if tracking ID is not found
       mockStatus = new MockStatus({
         trackingId,
-        expectedDeliveryDate: expectedDeliveryDate ?? fakeFutureDate(),
+        expectedDeliveryDate: resolveMockDeliveryDate({
+          exists: false,
+          storedDeliveryDate: null,
+          providedDeliveryDate: expectedDeliveryDate,
+          generatedDeliveryDate: fakeFutureDate(),
+        }),
         events: newEvents,
       });
     } else {
       // Prepend new events to the beginning of the array (that is how bluedart works)
       mockStatus.events.unshift(...newEvents);
-      // Update delivery date if explicitly provided, otherwise keep existing
-      if (expectedDeliveryDate !== undefined) {
-        mockStatus.expectedDeliveryDate = expectedDeliveryDate;
-      }
+      mockStatus.expectedDeliveryDate = resolveMockDeliveryDate({
+        exists: true,
+        storedDeliveryDate: mockStatus.expectedDeliveryDate,
+        providedDeliveryDate: expectedDeliveryDate,
+        generatedDeliveryDate: fakeFutureDate(),
+      });
     }
 
     await mockStatus.save();
