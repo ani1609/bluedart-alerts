@@ -47,6 +47,7 @@ export default function PackageDetails({
         <div className="w-full flex flex-col gap-y-6">
           <div className="flex flex-col gap-y-2">
             <p>Package ID: {trackingId}</p>
+            <p>Title: {shipment?.title || "N/A"}</p>
             <p>
               Expected Delivery Date: {shipment?.expectedDeliveryDate || "N/A"}
             </p>
