@@ -81,6 +81,7 @@ export default function PackageDetails({
           <div className="flex flex-col gap-y-2">
             <Skeleton className="h-5 w-48" />
             <Skeleton className="h-5 w-64" />
+            <Skeleton className="h-5 w-44" />
             <Skeleton className="h-5 w-32" />
           </div>
 
